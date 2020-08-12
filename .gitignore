@@ -1,0 +1,11 @@
+# Python environment
+venv
+__pycache__
+
+# Dev environment
+.vscode
+
+# Build
+*.egg-info
+dist
+build
