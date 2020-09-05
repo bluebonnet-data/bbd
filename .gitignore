@@ -11,5 +11,5 @@ __pycache__
 dist
 build
 
-# Extra files
-temp_gis
+# User files
+user
