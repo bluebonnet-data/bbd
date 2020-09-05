@@ -33,6 +33,8 @@ setuptools.setup(
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src", exclude=["docs", "tests*"],),
     install_requires=["shapely", "pyshp"],
+    extras_require={"dev": ["flake8", "black"]},
+    tests_require=["pytest"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
