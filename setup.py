@@ -32,6 +32,7 @@ setuptools.setup(
     url="https://www.bluebonnetdata.org/",
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src", exclude=["docs", "tests*"],),
+    install_requires=["shapely", "pyshp"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
