@@ -4,8 +4,12 @@ __pycache__
 
 # Dev environment
 .vscode
+.tox
 
 # Build
 *.egg-info
 dist
 build
+
+# Extra files
+temp_gis
