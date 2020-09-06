@@ -3,6 +3,10 @@
 test:
 	tox
 
+test-editable:
+	pip install -e .
+	pytest
+
 clean:
 	# On Windows, may need to add %git home%\usr\bin to path
 	rm -rf build dist .egg src/bbd.egg-info
