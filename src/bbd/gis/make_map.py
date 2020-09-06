@@ -32,7 +32,7 @@ def make_map(shpf_path: str, data: dict, join_on: str, join_on_alias: str = None
         raise ValueError("All values in the data dict must be the same length!")
 
     # Read shapefile
-    with shapefile.Reader(shpf_path) as shpf:
+    with shapefile.Reader(str(shpf_path)) as shpf:
         geojson = shpf.__geo_interface__
 
     # Presently, can only operate on feature collections
