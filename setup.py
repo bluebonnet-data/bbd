@@ -19,6 +19,12 @@ def get_version(rel_path):
         raise RuntimeError("Unable to find version string.")
 
 
+requires = [
+    "shapely",
+    "pyshp",
+    "folium",
+]
+
 long_description = read("README.md")
 
 setuptools.setup(
@@ -32,7 +38,7 @@ setuptools.setup(
     url="https://www.bluebonnetdata.org/",
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src", exclude=["docs", "tests*"],),
-    install_requires=["shapely", "pyshp"],
+    install_requires=requires,
     extras_require={"dev": ["flake8", "black"]},
     tests_require=["pytest"],
     classifiers=[
