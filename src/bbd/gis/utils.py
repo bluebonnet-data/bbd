@@ -112,6 +112,24 @@ def extract_from_census_json(fp, headers: list) -> dict:
     return d
 
 
+def get_first_coordinate(geojson: dict):
+    def not_impl(entity: str, of_type: str):
+        return (
+            f"Sorry! Cannot yet get first coordinate from {entity} of type '{of_type}'"
+        )
+
+    if geojson["type"] == "FeatureCollection":
+        geom = geojson["features"][0]["geometry"]
+        if geom["type"] == "Polygon":
+            coordinate = list(geom["coordinates"][0][0])
+            coordinate.reverse()  # flip coordinates from (long, lat) to (lat, long)
+            return coordinate
+        else:
+            raise NotImplementedError(not_impl("geometry", of_type=geom["type"]))
+    else:
+        raise NotImplementedError(not_impl("GeoJson", of_type=geojson["type"]))
+
+
 if __name__ == "__main__":
     x = are_coordinates_in_shape(
         [-80.09608714445338],

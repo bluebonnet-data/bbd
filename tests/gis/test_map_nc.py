@@ -66,8 +66,7 @@ def test_map_nc():
     )
 
     # Location of one coordinate
-    coordinate = list(data_map.data["features"][0]["geometry"]["coordinates"][0][0])
-    coordinate.reverse()  # coordinates are stored (long, lat), need them in (lat, long)
+    coordinate = gis.get_first_coordinate(data_map.data)
 
     # Create leaflet map and add GeoJson map to it
     m = folium.Map(location=coordinate, tiles="cartodbpositron", zoom_start=7)
