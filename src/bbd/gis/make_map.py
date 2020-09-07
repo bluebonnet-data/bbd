@@ -47,7 +47,10 @@ def make_map(
 
     # Read shapefile
     with shapefile.Reader(str(shpf_path)) as shpf:
-        geojson = shpf.__geo_interface__
+        # NOTE: This is a work-around until the shapefile.Reader.__geo_interface__
+        # bug is fixed... TODO add bug report number
+        features = [f.__geo_interface__ for f in shpf.iterShapeRecords()]
+        geojson = {"type": "FeatureCollection", "bbox": shpf.bbox, "features": features}
 
     # Presently, can only operate on feature collections
     if not geojson["type"] == "FeatureCollection":
@@ -62,7 +65,7 @@ def make_map(
 
         # Initialize empty property fields. All features must have
         # the same properties.
-        [properties.update({k: ""}) for k in data.keys()]
+        [properties.update({k: None}) for k in data.keys()]
 
         # Check if this feature has the property to join on
         try:
@@ -94,8 +97,13 @@ def make_map(
         )
 
         def style_function(feature: dict):
+            value = feature["properties"][color_by]
+            if value is not None:
+                fill = colormap(value)
+            else:
+                fill = "grey"
             return {
-                "fillColor": colormap(feature["properties"][color_by]),
+                "fillColor": fill,
                 "color": "black",
                 "weight": 2,
                 "fillOpacity": 0.5,

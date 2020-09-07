@@ -35,13 +35,13 @@ def test_map_colorado():
 
         DP03_0062E_float = float(row[DP03_0062E_index])
         DP03_0062E_value.append(DP03_0062E_float)
-        DP03_0062E_currency.append(
-            "${:,.2f}".format(DP03_0062E_float,)
-        )  # e.g. $1,234.56
+
+        # Format as currency, e.g. $1,234.56
+        DP03_0062E_currency.append("${:,.2f}".format(DP03_0062E_float))
 
     data = {
         "Name": names,
-        "CD116FP": geoids,  # Shapefile GEOIDs are stored under this property idk why
+        "GEOID": geoids,
         "Median Household Income": DP03_0062E_currency,
         "Median Household Income value": DP03_0062E_value,
     }
@@ -50,7 +50,7 @@ def test_map_colorado():
     data_map = gis.make_map(
         data_dir / "tl_2019_08_cd116",
         data,
-        join_on="CD116FP",
+        join_on="GEOID",
         color_by="Median Household Income value",
         exclude=["Median Household Income value"],  # Only needed to color by
     )
