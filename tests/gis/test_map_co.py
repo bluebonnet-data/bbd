@@ -7,7 +7,7 @@ import folium
 from bbd import gis
 
 
-locale.setlocale(locale.LC_ALL, "")
+locale.setlocale(locale.LC_ALL, "en_CA.UTF-8")
 data_dir = Path(__file__).parent / "shapefiles/co/"
 
 
