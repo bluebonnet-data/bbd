@@ -2,9 +2,18 @@ from pathlib import Path
 
 import shapefile
 import folium
+import branca
 
 
-def make_map(shpf_path: str, data: dict, join_on: str, join_on_alias: str = None):
+def make_map(
+    shpf_path: str,
+    data: dict,
+    join_on: str,
+    join_on_alias: str = None,
+    color_by: str = None,
+    extend_include: list = [],
+    exclude: list = [],
+):
     """Creates a folium.features.GeoJson map object.
     Joins map properties with the properties in `data` and shows `data` in the map popup tooltips.
 
@@ -17,10 +26,15 @@ def make_map(shpf_path: str, data: dict, join_on: str, join_on_alias: str = None
     :param join_on_alias: If None (default) the `join_on` property will not be shown in the tooltip.
         If a value is given, the `join_on` parameter will be shown with the `join_on_alias` name
         at the top of the tooltip.
+    :param color_by: If None (default) all shapes will be the same color. Otherwise, a linear
+        colormap will be generated based on the min and max values of the data[color_by] list.
     """
+
     data = data.copy()
-    joiner = data.pop(join_on)  # List of values to join shapefile and data on
-    if joiner is None:
+
+    try:
+        joiner = data.pop(join_on)  # List of values to join shapefile and data on
+    except KeyError:
         raise KeyError(
             f"The join_on parameter '{join_on}' was not found in the data's keys: {data.keys()}"
         )
@@ -69,8 +83,29 @@ def make_map(shpf_path: str, data: dict, join_on: str, join_on_alias: str = None
     # The bbox is stored as a shapefile._Array, which is not serializable
     geojson["bbox"] = list(geojson["bbox"])
 
+    # Create style function
+    if color_by is not None:
+        colormap = branca.colormap.LinearColormap(
+            colors=["#105569", "#1fc3f0"],
+            index=None,  # Will default to linear range between colors
+            vmin=min(data[color_by]),
+            vmax=max(data[color_by]),
+            caption=f"{color_by} Density",
+        )
+
+        def style_function(feature: dict):
+            return {
+                "fillColor": colormap(feature["properties"][color_by]),
+                "color": "black",
+                "weight": 2,
+                "fillOpacity": 0.5,
+            }
+
     # Determine tooltip fields and display values
     base_fields = list(data.keys())
+
+    base_fields.extend(extend_include)  # Extend field list with custom input
+    [base_fields.remove(x) for x in exclude if x in base_fields]  # Remove requested
 
     if join_on_alias is None:
         fields = base_fields
@@ -83,6 +118,6 @@ def make_map(shpf_path: str, data: dict, join_on: str, join_on_alias: str = None
     return folium.GeoJson(
         geojson,
         name=Path(shpf_path).name,
-        # style_function=style_function, # TODO add style function
+        style_function=style_function if color_by else None,
         tooltip=folium.GeoJsonTooltip(fields=fields, aliases=aliases, localize=True),
     )
