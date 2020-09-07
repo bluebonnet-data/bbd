@@ -1,13 +1,11 @@
 from pathlib import Path
 import json
-import locale
 
 import folium
 
 from bbd import gis
 
 
-locale.setlocale(locale.LC_ALL, "en_CA.UTF-8")
 data_dir = Path(__file__).parent / "shapefiles/co/"
 
 
@@ -37,7 +35,9 @@ def test_map_colorado():
 
         DP03_0062E_float = float(row[DP03_0062E_index])
         DP03_0062E_value.append(DP03_0062E_float)
-        DP03_0062E_currency.append(locale.currency(DP03_0062E_float, grouping=True))
+        DP03_0062E_currency.append(
+            "${:,.2f}".format(DP03_0062E_float,)
+        )  # e.g. $1,234.56
 
     data = {
         "Name": names,
