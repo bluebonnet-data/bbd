@@ -98,10 +98,7 @@ def make_map(
 
         def style_function(feature: dict):
             value = feature["properties"][color_by]
-            if value is not None:
-                fill = colormap(value)
-            else:
-                fill = "grey"
+            fill = colormap(value) if value is not None else "grey"
             return {
                 "fillColor": fill,
                 "color": "black",
