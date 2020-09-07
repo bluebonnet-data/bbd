@@ -89,7 +89,7 @@ def make_map(
     # Create style function
     if color_by is not None:
         colormap = branca.colormap.LinearColormap(
-            colors=["#105569", "#1fc3f0"],
+            colors=["#764aed", "#fc6665"],
             index=None,  # Will default to linear range between colors
             vmin=min(data[color_by]),
             vmax=max(data[color_by]),
