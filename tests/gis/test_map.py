@@ -25,7 +25,7 @@ save_path = tempfile.mktemp(suffix=".html")
 def test_make_map_joins_properly():
     data = standard_data
 
-    data_map = gis.make_map(shapefile_path, data, join_on="name", join_on_alias="Name",)
+    data_map = gis.make_map(shapefile_path, data, join_on="name",)
 
     geojson = data_map.data
     assert geojson["type"] == "FeatureCollection"
@@ -88,13 +88,32 @@ def test_make_map_tooltip_without_alias():
     assert tooltip.aliases == ["Demographic 1", "Demographic 2"]
 
 
-def test_make_map_tooltip_with_alias():
+def test_make_map_tooltip_with_field_include():
     data = standard_data
 
-    data_map = gis.make_map(shapefile_path, data, join_on="name", join_on_alias="Name")
+    fields = list(data.keys())
+
+    data_map = gis.make_map(shapefile_path, data, join_on="name", include=fields)
 
     children = data_map._children
     tooltip = children.popitem(last=False)[1]  # Get first tooltip
 
     assert tooltip.fields == ["name", "Demographic 1", "Demographic 2"]
-    assert tooltip.aliases == ["Name", "Demographic 1", "Demographic 2"]
+    assert tooltip.aliases == ["name", "Demographic 1", "Demographic 2"]
+
+
+def test_make_map_tooltip_with_alias_include():
+    data = standard_data
+
+    aliases = {
+        "name": "Name",
+        "Demographic 1": "Population",
+    }
+
+    data_map = gis.make_map(shapefile_path, data, join_on="name", include=aliases)
+
+    children = data_map._children
+    tooltip = children.popitem(last=False)[1]  # Get first tooltip
+
+    assert tooltip.fields == ["name", "Demographic 1"]
+    assert tooltip.aliases == ["Name", "Population"]

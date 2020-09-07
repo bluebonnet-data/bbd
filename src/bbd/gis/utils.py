@@ -4,6 +4,7 @@ GIS utility functions.
 
 from pathlib import Path
 import logging
+import json
 
 import shapefile
 from shapely.geometry import Point
@@ -86,6 +87,29 @@ def are_coordinates_in_shape(
                 ]
 
     return polygonIds
+
+
+def extract_from_census_json(fp, headers: list) -> dict:
+    """Extract column data for the requested headers"""
+
+    with open(fp, "r") as f:
+        data = json.load(f)
+
+    # Top row is header row
+    all_headers = data[0]
+
+    # Get indexes for each requested header
+    indexes = [all_headers.index(h) for h in headers]
+
+    # Construct data container
+    d = {h: [] for h in headers}
+
+    # Pull out the requested data in each row
+    for row in data[1:]:  # Skip header row
+
+        [d[h].append(row[i]) for h, i in zip(headers, indexes)]
+
+    return d
 
 
 if __name__ == "__main__":

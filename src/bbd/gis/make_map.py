@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Union
 
 import shapefile
 import folium
@@ -9,10 +10,8 @@ def make_map(
     shpf_path: str,
     data: dict,
     join_on: str,
-    join_on_alias: str = None,
     color_by: str = None,
-    extend_include: list = [],
-    exclude: list = [],
+    include: Union[list, dict, None] = None,
 ):
     """Creates a folium.features.GeoJson map object.
     Joins map properties with the properties in `data` and shows `data` in the map popup tooltips.
@@ -23,11 +22,12 @@ def make_map(
         you can use an `OrderedDict`.
     :param join_on: The data key (header) used to join the shapefile property table with `data`.
         This parameter must be a key in the `data` dict.
-    :param join_on_alias: If None (default) the `join_on` property will not be shown in the tooltip.
-        If a value is given, the `join_on` parameter will be shown with the `join_on_alias` name
-        at the top of the tooltip.
-    :param color_by: If None (default) all shapes will be the same color. Otherwise, a linear
+    :param color_by: Optional. If None (default) all shapes will be the same color. Otherwise, a linear
         colormap will be generated based on the min and max values of the data[color_by] list.
+    :param include: Optional. If None (default) all keys in the `data` table will be shown in the
+        tooltip. If `include` is a `list` of `str`, only those values will be shown in the tooltip.
+        If `include` is a `dict` of `{str:str}`, the tooltip fields are set to the 'keys' and the
+        aliases are set to the 'values'.
     """
 
     data = data.copy()
@@ -106,18 +106,23 @@ def make_map(
                 "fillOpacity": 0.5,
             }
 
-    # Determine tooltip fields and display values
-    base_fields = list(data.keys())
+    if isinstance(include, list):  # Display these fields as is
+        fields = include
+        aliases = include
 
-    base_fields.extend(extend_include)  # Extend field list with custom input
-    [base_fields.remove(x) for x in exclude if x in base_fields]  # Remove requested
+    elif isinstance(include, dict):  # Display fields as key=field, value=alias
+        fields = []
+        aliases = []
+        [(fields.append(k), aliases.append(v)) for k, v in include.items()]
 
-    if join_on_alias is None:
-        fields = base_fields
+    elif include is None:  # Display all fields as given in the joined data
+        fields = list(data.keys())
         aliases = fields
+
     else:
-        fields = [join_on] + base_fields
-        aliases = [join_on_alias] + base_fields
+        raise ValueError(
+            f"The `include` parameter must be a list, dict, or None. Not: {type(include)}"
+        )
 
     # Create GeoJson map object
     return folium.GeoJson(

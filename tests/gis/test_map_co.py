@@ -1,5 +1,4 @@
 from pathlib import Path
-import json
 
 import folium
 
@@ -12,38 +11,26 @@ data_dir = Path(__file__).parent / "shapefiles/co/"
 def test_map_colorado():
 
     # Read congresisonal district data
-    with open(data_dir / "DP03_08_cd.json", "r") as f:
-        jdata = json.load(f)
+    # Median household income estimate is "DP03_0062E", https://api.census.gov/data/2018/acs/acs1/profile/groups/DP03.html
+    data = gis.extract_from_census_json(
+        data_dir / "DP03_08_cd.json", headers=["NAME", "GEO_ID", "DP03_0062E"]
+    )
 
-    # Extract relevant data (that we want to plot)
-    headers = jdata[0]
+    # .shp GEOID uses last 4 digits
+    data["GEOID"] = [geoid[-4:] for geoid in data["GEO_ID"]]
 
-    names = []
-    name_index = headers.index("NAME")
+    # Create column of floats (to color by)
+    data["Income Value"] = [float(x) for x in data["DP03_0062E"]]
 
-    geoids = []
-    geoid_index = headers.index("GEO_ID")
+    # Create column of nicely formatted strings (to display)
+    data["Median Household Income"] = [
+        "${:,.2f}".format(x) for x in data["Income Value"]
+    ]
 
-    # NOTE: DP03_0062E: Median household income estimate, https://api.census.gov/data/2018/acs/acs1/profile/groups/DP03.html
-    DP03_0062E_currency = []
-    DP03_0062E_value = []
-    DP03_0062E_index = headers.index("DP03_0062E")
-
-    for row in jdata[1:]:  # Skip header row
-        names.append(row[name_index])
-        geoids.append(row[geoid_index][-4:])  # Shapefile GEOID only uses last 4 digits
-
-        DP03_0062E_float = float(row[DP03_0062E_index])
-        DP03_0062E_value.append(DP03_0062E_float)
-
-        # Format as currency, e.g. $1,234.56
-        DP03_0062E_currency.append("${:,.2f}".format(DP03_0062E_float))
-
-    data = {
-        "Name": names,
-        "GEOID": geoids,
-        "Median Household Income": DP03_0062E_currency,
-        "Median Household Income value": DP03_0062E_value,
+    aliases = {
+        "NAME": "Name",
+        "GEO_ID": "GEOID",
+        "Median Household Income": "Median Household Income",
     }
 
     # Make GIS GeoJson map object
@@ -51,8 +38,8 @@ def test_map_colorado():
         data_dir / "tl_2019_08_cd116",
         data,
         join_on="GEOID",
-        color_by="Median Household Income value",
-        exclude=["Median Household Income value"],  # Only needed to color by
+        color_by="Income Value",
+        include=aliases,
     )
 
     # Location of one coordinate
