@@ -12,6 +12,7 @@ def test_map_colorado():
 
     # Read congresisonal district data
     # Median household income estimate is "DP03_0062E", https://api.census.gov/data/2018/acs/acs1/profile/groups/DP03.html
+    # https://api.census.gov/data/2018/acs/acs1/profile?get=group(DP03),NAME&for=congressional%20district:*&in=state:08
     data = gis.extract_from_census_json(
         data_dir / "DP03_08_cd.json", headers=["NAME", "GEO_ID", "DP03_0062E"]
     )
@@ -34,6 +35,7 @@ def test_map_colorado():
     }
 
     # Make GIS GeoJson map object
+    # https://www.census.gov/cgi-bin/geo/shapefiles/index.php, search for "Congressional Districts"
     data_map = gis.make_map(
         data_dir / "tl_2019_08_cd116",
         data,
