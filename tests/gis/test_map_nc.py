@@ -38,7 +38,7 @@ def test_map_nc():
     ]
 
     # Percentage of white people (formatted nicely for display)
-    data["% White (display)"] = [f"{round(x * 100, 1)}%" for x in data["% White"]]
+    data["% White (pretty format)"] = [f"{round(x * 100, 1)}%" for x in data["% White"]]
 
     aliases = {
         "NAME": "Name",
@@ -51,7 +51,7 @@ def test_map_nc():
         "H006006": "Pasific Islander",
         "H006007": "Other",
         "H006008": "Two or More",
-        "% White (display)": "Percent White",
+        "% White (pretty format)": "Percent White",
     }
 
     # Initialize leaflet map

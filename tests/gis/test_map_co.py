@@ -24,14 +24,14 @@ def test_map_colorado():
     data["Median Household Income"] = [float(x) for x in data["DP03_0062E"]]
 
     # Create column of nicely formatted strings (to display)
-    data["Income (pretty format)"] = [
+    data["Median Household Income (pretty format)"] = [
         "${:,.2f}".format(x) for x in data["Median Household Income"]
     ]
 
     aliases = {
         "NAME": "Name",
         "GEO_ID": "GEOID",
-        "Income (pretty format)": "Median Household Income",
+        "Median Household Income (pretty format)": "Median Household Income",
     }
 
     # Initialize leaflet map
