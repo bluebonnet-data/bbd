@@ -112,22 +112,28 @@ def extract_from_census_json(fp, headers: list) -> dict:
     return d
 
 
-def get_first_coordinate(geojson: dict):
-    def not_impl(entity: str, of_type: str):
-        return (
-            f"Sorry! Cannot yet get first coordinate from {entity} of type '{of_type}'"
-        )
+def get_geojson_bounds(geojson: dict):
+    """Returns geojson bounds in format compatible with
+    folium.Map.set_bounds() method.
 
-    if geojson["type"] == "FeatureCollection":
-        geom = geojson["features"][0]["geometry"]
-        if geom["type"] == "Polygon":
-            coordinate = list(geom["coordinates"][0][0])
-            coordinate.reverse()  # flip coordinates from (long, lat) to (lat, long)
-            return coordinate
-        else:
-            raise NotImplementedError(not_impl("geometry", of_type=geom["type"]))
+    Returns two (lat, long) points: [southwest, northeast]
+    """
+
+    # NOTE: bbox is given as:
+    #   2D: [SW lat, SW long, NE lat, NE long]
+    #   3D: [SW lat, SW long, SW elev, NE lat, NE long, NE elev]
+    bbox = geojson["bbox"]
+
+    # Not sure if this is a PyShp BUG, but it seems like the coordinates
+    # are consistently stored (long, lat) instead of (lat, long)
+    if len(bbox) == 4:  # 2D GeoJson
+        return [[bbox[1], bbox[0]], [bbox[3], bbox[2]]]
+    elif len(bbox) == 6:  # 3D GeoJson
+        return [[bbox[1], bbox[0]], [bbox[4], bbox[3]]]
     else:
-        raise NotImplementedError(not_impl("GeoJson", of_type=geojson["type"]))
+        raise NotImplementedError(
+            f"Sorry! Expected bbox with 4 or 6 elements. Got: {bbox}"
+        )
 
 
 if __name__ == "__main__":

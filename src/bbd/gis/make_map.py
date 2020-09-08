@@ -12,6 +12,7 @@ def make_map(
     join_on: str,
     color_by: str = None,
     include: Union[list, dict, None] = None,
+    map_: folium.Map = None,
 ):
     """Creates a folium.features.GeoJson map object.
     Joins map properties with the properties in `data` and shows `data` in the map popup tooltips.
@@ -28,6 +29,8 @@ def make_map(
         tooltip. If `include` is a `list` of `str`, only those values will be shown in the tooltip.
         If `include` is a `dict` of `{str:str}`, the tooltip fields are set to the 'keys' and the
         aliases are set to the 'values'.
+    :param map_: Optional. If included, the folium.GeoJson and branca.ColorMap objects will be added to
+        the map as they are created. If not included, you can add the folium.GeoJson object manually.
     """
 
     data = data.copy()
@@ -93,8 +96,11 @@ def make_map(
             index=None,  # Will default to linear range between colors
             vmin=min(data[color_by]),
             vmax=max(data[color_by]),
-            caption=f"{color_by} Density",
+            caption=str(color_by),
         )
+
+        if map_ is not None:
+            map_.add_child(colormap)
 
         def style_function(feature: dict):
             value = feature["properties"][color_by]
@@ -125,9 +131,15 @@ def make_map(
         )
 
     # Create GeoJson map object
-    return folium.GeoJson(
+    geojson_map = folium.GeoJson(
         geojson,
         name=Path(shpf_path).name,
         style_function=style_function if color_by else None,
         tooltip=folium.GeoJsonTooltip(fields=fields, aliases=aliases, localize=True),
     )
+
+    # Add to map parameter if applicable
+    if map_ is not None:
+        geojson_map.add_to(map_)
+
+    return geojson_map

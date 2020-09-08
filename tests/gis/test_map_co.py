@@ -21,40 +21,41 @@ def test_map_colorado():
     data["GEOID"] = [geoid[-4:] for geoid in data["GEO_ID"]]
 
     # Create column of floats (to color by)
-    data["Income Value"] = [float(x) for x in data["DP03_0062E"]]
+    data["Median Household Income"] = [float(x) for x in data["DP03_0062E"]]
 
     # Create column of nicely formatted strings (to display)
-    data["Median Household Income"] = [
-        "${:,.2f}".format(x) for x in data["Income Value"]
+    data["Income (pretty format)"] = [
+        "${:,.2f}".format(x) for x in data["Median Household Income"]
     ]
 
     aliases = {
         "NAME": "Name",
         "GEO_ID": "GEOID",
-        "Median Household Income": "Median Household Income",
+        "Income (pretty format)": "Median Household Income",
     }
 
+    # Initialize leaflet map
+    map_ = folium.Map(tiles="cartodbpositron")
+
     # Make GIS GeoJson map object
-    # https://www.census.gov/cgi-bin/geo/shapefiles/index.php, search for "Congressional Districts"
-    data_map = gis.make_map(
+    # Shapefile from: https://www.census.gov/cgi-bin/geo/shapefiles/index.php
+    # Search for "Congressional Districts"
+    geojson_map = gis.make_map(
         data_dir / "tl_2019_08_cd116",
         data,
         join_on="GEOID",
-        color_by="Income Value",
+        color_by="Median Household Income",
         include=aliases,
+        map_=map_,
     )
 
-    # Location of one coordinate
-    coordinate = gis.get_first_coordinate(data_map.data)
-
-    # Create leaflet map and add GeoJson map to it
-    m = folium.Map(location=coordinate, tiles="cartodbpositron", zoom_start=7)
-    data_map.add_to(m)
+    # Set map location to the first coordinate in the GeoJson
+    map_.fit_bounds(gis.get_geojson_bounds(geojson_map.data))
 
     # Write output file
     save_file = Path.cwd() / "user/map.html"
     save_file.parent.mkdir(exist_ok=True, parents=True)
-    m.save(str(save_file))
+    map_.save(str(save_file))
 
 
 if __name__ == "__main__":

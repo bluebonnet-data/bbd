@@ -32,13 +32,13 @@ def test_map_nc():
     data["GEOID"] = [geoid[-5:] for geoid in data["GEO_ID"]]
 
     # Percentage of white people out of the total respondants (to color by)
-    data["White %"] = [
+    data["% White"] = [
         float(w) / float(t) if not t == 0 else 100
         for w, t in zip(data["H006002"], data["H006001"])
     ]
 
     # Percentage of white people (formatted nicely for display)
-    data["White % (display)"] = [f"{round(x * 100, 1)}%" for x in data["White %"]]
+    data["% White (display)"] = [f"{round(x * 100, 1)}%" for x in data["% White"]]
 
     aliases = {
         "NAME": "Name",
@@ -51,31 +51,31 @@ def test_map_nc():
         "H006006": "Pasific Islander",
         "H006007": "Other",
         "H006008": "Two or More",
-        "White % (display)": "Percent White",
+        "% White (display)": "Percent White",
     }
+
+    # Initialize leaflet map
+    map_ = folium.Map(tiles="cartodbpositron")
 
     # Make GIS GeoJson map object
     # Shapefile from: https://www.census.gov/cgi-bin/geo/shapefiles/index.php
     # Search for "County,"" then select "North Carolina"
-    data_map = gis.make_map(
+    geojson_map = gis.make_map(
         data_dir / "tl_2019_37_county",
         data,
         join_on="GEOID",
-        color_by="White %",
+        color_by="% White",
         include=aliases,
+        map_=map_,
     )
 
-    # Location of one coordinate
-    coordinate = gis.get_first_coordinate(data_map.data)
-
-    # Create leaflet map and add GeoJson map to it
-    m = folium.Map(location=coordinate, tiles="cartodbpositron", zoom_start=7)
-    data_map.add_to(m)
+    # Set map location to the first coordinate in the GeoJson
+    map_.fit_bounds(gis.get_geojson_bounds(geojson_map.data))
 
     # Write output file
     save_file = Path.cwd() / "user/map.html"
     save_file.parent.mkdir(exist_ok=True, parents=True)
-    m.save(str(save_file))
+    map_.save(str(save_file))
 
 
 if __name__ == "__main__":
