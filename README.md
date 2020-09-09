@@ -38,12 +38,12 @@ For more information on how to come up with your own census API requests I'd hig
 
 This census data is stored more or less as a big table in json format:
 
-```json
+```python
 [
-    ["NAME", "GEO_ID", "DP03_0001E", ...] // Headers
-    ["Congressional District 1", "5001600US0801", "693303", ...] // Data
-    ["Congressional District 2", "5001600US0802", "672976", ...] // Data
-    ["...", "...", "...", ...] // Data
+    ["NAME", "GEO_ID", "DP03_0001E", ...] # Headers
+    ["Congressional District 1", "5001600US0801", "693303", ...] # Data
+    ["Congressional District 2", "5001600US0802", "672976", ...] # Data
+    ["...", "...", "...", ...] # Data
 ]
 ```
 
@@ -146,7 +146,7 @@ Finally, we can create the leaflet map and save it to our machine.
 >>> )
 ```
 
-Simply open `path/to/save/map.html` in your browser to view the map!
+Simply open `path/to/save/map.html` in your browser to view your map!
 
 ---
 Developed by [Bluebonnet Data](https://www.bluebonnetdata.org/)
