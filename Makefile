@@ -15,6 +15,7 @@ publish:
 	pip install 'twine>=1.5.0'
 	python setup.py sdist bdist_wheel
 	python -m twine upload dist/*
+	rm -fr build dist .egg src/bbd.egg-info
 
 flake8:
 	# Ignoring...
