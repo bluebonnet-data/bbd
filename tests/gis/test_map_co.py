@@ -1,7 +1,5 @@
 from pathlib import Path
 
-import folium
-
 from bbd import gis
 
 
@@ -34,28 +32,17 @@ def test_map_colorado():
         "Median Household Income (pretty format)": "Median Household Income",
     }
 
-    # Initialize leaflet map
-    map_ = folium.Map(tiles="cartodbpositron")
-
-    # Make GIS GeoJson map object
+    # Make and save GIS GeoJson map object
     # Shapefile from: https://www.census.gov/cgi-bin/geo/shapefiles/index.php
     # Search for "Congressional Districts"
-    geojson_map = gis.make_map(
+    gis.make_map(
         data_dir / "tl_2019_08_cd116",
         data,
         join_on="GEOID",
         color_by="Median Household Income",
         include=aliases,
-        map_=map_,
+        save_to=Path.cwd() / "user/map.html",
     )
-
-    # Set map location to the first coordinate in the GeoJson
-    map_.fit_bounds(gis.get_geojson_bounds(geojson_map.data))
-
-    # Write output file
-    save_file = Path.cwd() / "user/map.html"
-    save_file.parent.mkdir(exist_ok=True, parents=True)
-    map_.save(str(save_file))
 
 
 if __name__ == "__main__":

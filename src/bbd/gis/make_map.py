@@ -5,6 +5,8 @@ import shapefile
 import folium
 import branca
 
+from .utils import get_geojson_bounds
+
 
 def make_map(
     shpf_path: str,
@@ -13,6 +15,7 @@ def make_map(
     color_by: str = None,
     include: Union[list, dict, None] = None,
     map_: folium.Map = None,
+    save_to: Union[str, Path, None] = None,
 ):
     """Creates a folium.features.GeoJson map object.
     Joins map properties with the properties in `data` and shows `data` in the map popup tooltips.
@@ -31,6 +34,9 @@ def make_map(
         aliases are set to the 'values'.
     :param map_: Optional. If included, the folium.GeoJson and branca.ColorMap objects will be added to
         the map as they are created. If not included, you can add the folium.GeoJson object manually.
+    :param save_to: Optional path to save file. If included, the map will be automatically saved to
+        the location specified by `save_to`. If you use this parameter, you don't need to pass in a `map_`
+        as one will automatically generated with default settings.
     """
 
     data = data.copy()
@@ -47,6 +53,10 @@ def make_map(
 
     if not all([len(joiner) == len(v) for v in data.values()]):
         raise ValueError("All values in the data dict must be the same length!")
+
+    # If the caller wants us to save but does not provide a map, create one
+    if save_to is not None and map_ is None:
+        map_ = folium.Map(tiles="cartodbpositron")
 
     # Read shapefile
     with shapefile.Reader(str(shpf_path)) as shpf:
@@ -138,8 +148,21 @@ def make_map(
         tooltip=folium.GeoJsonTooltip(fields=fields, aliases=aliases, localize=True),
     )
 
-    # Add to map parameter if applicable
+    # Add to folium.Map if that parameter was passed in
     if map_ is not None:
         geojson_map.add_to(map_)
+
+    # Save map_ if a save path was provided
+    if save_to is not None:
+        assert map_ is not None
+
+        # Fit bounds to the GeoJson shapes
+        map_.fit_bounds(get_geojson_bounds(geojson_map.data))
+
+        # Ensure path exists
+        Path(save_to).parent.mkdir(exist_ok=True, parents=True)
+
+        # Save
+        map_.save(str(save_to))
 
     return geojson_map
