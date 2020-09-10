@@ -48,4 +48,5 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.6",
+    project_urls={"Source": "https://github.com/bluebonnet-data/bbd"},
 )
