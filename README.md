@@ -3,6 +3,7 @@
 **BBD** is a library for helping teams perform political campaign data analysis.
 
 ![Build](https://github.com/bluebonnet-data/bbd/workflows/build/badge.svg)
+[![PyPI version](https://badge.fury.io/py/bbd.svg)](https://badge.fury.io/py/bbd)
 
 ## Installing BBD
 
