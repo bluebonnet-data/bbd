@@ -137,6 +137,9 @@ def make_map(
                 "fillOpacity": 0.5,
             }
 
+    else:
+        style_function = None
+
     if isinstance(include, list):  # Display these fields as is
         fields = include
         aliases = include
@@ -159,7 +162,7 @@ def make_map(
     geojson_map = folium.GeoJson(
         geojson,
         name=Path(shpf_path).name,
-        style_function=style_function if color_by else None,
+        style_function=style_function,
         tooltip=folium.GeoJsonTooltip(fields=fields, aliases=aliases, localize=True),
     )
 
