@@ -24,6 +24,8 @@ requires = [
     "pyshp",
     "folium",
     "branca",
+    "requests",
+    "us",
 ]
 
 long_description = read("README.md")
