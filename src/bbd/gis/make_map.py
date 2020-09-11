@@ -63,8 +63,11 @@ def make_map(
     with shapefile.Reader(str(shpf_path)) as shpf:
         # NOTE: This is a work-around until the shapefile.Reader.__geo_interface__
         # bug is fixed... TODO add bug report number
-        features = [f.__geo_interface__ for f in shpf.iterShapeRecords()]
-        geojson = {"type": "FeatureCollection", "bbox": shpf.bbox, "features": features}
+        geojson = {
+            "type": "FeatureCollection",
+            "bbox": shpf.bbox,
+            "features": [sfr.__geo_interface__ for sfr in shpf.iterShapeRecords()],
+        }
 
     # Presently, can only operate on feature collections
     if not geojson["type"] == "FeatureCollection":
