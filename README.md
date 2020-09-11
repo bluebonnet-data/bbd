@@ -70,7 +70,7 @@ We'll need to transform it into a format that is plottable. To do so, the `gis.e
 
 ### Getting Shapefiles
 
-Luckily, the census provides shapefiles for pretty much every `GEO_ID` you can find in the census API!
+Luckily, the census provides shapefiles for pretty much every `GEO_ID` you can find in the census API.
 
 Just head to [this website](https://www.census.gov/cgi-bin/geo/shapefiles/index.php) and select the relevent geography/location.
 
@@ -89,7 +89,7 @@ I happen to know that the GEO_ID in the shapefile is stored under the key "GEOID
 >>> data["GEOID"] = [geoid[-4:] for geoid in data["GEO_ID"]]
 ```
 
-To determine how many digits you need for your own shapefile, I'd recommend just taking a quick look with [PyShp](https://pypi.org/project/pyshp/)!
+To determine how many digits you need for your own shapefile, I'd recommend just taking a quick look with [PyShp](https://pypi.org/project/pyshp/).
 
 ```console
 python -m pip install pyshp
@@ -122,7 +122,7 @@ You can also of course simply view the property table in your favorite GIS softw
 
 ### Create Data to Color By
 
-We want our map to have color! Since our data incudes median household income, I'd like to color by that. However, it is currently stored as a string! Color maps don't know what strings are! We need to make another entry that converts those strings into floats. 
+The only thing better than a map is a map with color. You know the saying. The column to color by must be numeric.
 
 ```python
 >>> # Note: the name of this entry will be used as the text caption on the colormap
