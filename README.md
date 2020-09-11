@@ -28,7 +28,7 @@ We can simply downloaded the json data from [here](https://api.census.gov/data/2
 
     https://api.census.gov/data/2018/acs/acs1/profile?get=group(DP03),NAME&for=congressional%20district:*&in=state:08
 
-For more information on how to come up with your own census API requests I'd highly recommend the first 6 minutes of [this video](https://www.census.gov/library/video/2020/using-api-all-results-for-acs-table.html). For reference, the following table describes the basic elements of the API call used to get this working example's data.
+For more information on how to come up with your own census API requests I'd highly recommend the first 6 minutes of [this video](https://www.census.gov/library/video/2020/using-api-all-results-for-acs-table.html). A great place to just start browsing is the [census data sets home page](https://www.census.gov/data/developers/data-sets.html). For reference, the following table describes the basic elements of the API call used to get this working example's data.
 
 | URL Part               | Meaning
 | ----------------       |-------------
