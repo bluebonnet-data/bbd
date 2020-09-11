@@ -15,6 +15,12 @@ python -m pip install bbd
 
 ## Example
 
+For a running start, you can copy the [examples](examples/) folder to your machine and run the example python script to map median household income per census tract in Larimer county, Colorado.
+
+## Walkthrough
+
+Follow along with this walkthrough to learn more detailed infomation about using this library.
+
 ### Getting Census Data
 First, find the data you want to visualize. This is often easiest through the census API, and the next bit of text will read a bit like a "How to Get Census Data" tutorial. In the future there are plans to automate this process through the **bbd** library.
 
