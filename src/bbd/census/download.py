@@ -59,6 +59,7 @@ def download_shapefile(
     geography: Geography, save_dir: str, state: Union[int, str], year: int,
 ) -> str:
     """Download and extract a census shapefile for a specified geography.
+    Returns the name of the extracted directory.
 
     Shapefiles are also available directly from the US Census Bureau:
         https://www.census.gov/cgi-bin/geo/shapefiles/index.php
