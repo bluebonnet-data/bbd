@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Union
+from typing import Optional
 
 import shapefile
 import folium
@@ -13,10 +13,10 @@ def make_map(
     shpf_path: str,
     data: dict,
     join_on: str,
-    color_by: str = None,
-    include: Union[list, dict, None] = None,
-    map_: folium.Map = None,
-    save_to: Union[str, Path, None] = None,
+    color_by: Optional[str] = None,
+    include: Optional[list, dict] = None,
+    map_: Optional[folium.Map] = None,
+    save_to: Optional[str, Path] = None,
 ):
     """Creates a folium.features.GeoJson map object.
     Joins map properties with the properties in `data` and shows `data` in the map popup tooltips.
