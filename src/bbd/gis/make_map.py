@@ -5,7 +5,7 @@ import shapefile
 import folium
 import branca
 
-from ..census import Magic
+from .magic import Magic
 from .utils import get_geojson_bounds
 
 
