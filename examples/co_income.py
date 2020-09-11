@@ -60,5 +60,5 @@ gis.make_map(
     data,
     join_on="GEOID",
     color_by="Median Household Income",
-    save_to=Path.cwd() / "user/map.html",
+    save_to=here / "map.html",
 )
