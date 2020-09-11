@@ -5,6 +5,7 @@ import shapefile
 import folium
 import branca
 
+from ..census import Magic
 from .utils import get_geojson_bounds
 
 
@@ -101,11 +102,15 @@ def make_map(
 
     # Create style function
     if color_by is not None:
+
+        # Remove magic numbers that represent missing data
+        color_by_values = [x for x in data[color_by] if x not in Magic.MISSING_VALUES]
+
         colormap = branca.colormap.LinearColormap(
             colors=["#764aed", "#fc6665"],
             index=None,  # Will default to linear range between colors
-            vmin=min(data[color_by]),
-            vmax=max(data[color_by]),
+            vmin=min(color_by_values),
+            vmax=max(color_by_values),
             caption=str(color_by),
         )
 
@@ -114,7 +119,14 @@ def make_map(
 
         def style_function(feature: dict):
             value = feature["properties"][color_by]
-            fill = colormap(value) if value is not None else "grey"
+
+            # Don't color missing values and don't color if
+            # the shape doesn't have the property to color by.
+            if value in Magic.MISSING_VALUES or value is None:
+                fill = "grey"
+            else:
+                fill = colormap(value)
+
             return {
                 "fillColor": fill,
                 "color": "black",
