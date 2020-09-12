@@ -56,7 +56,11 @@ def shapefile_urls(fips: str, year=2019) -> Dict[str, str]:
 
 
 def get_shapefile(
-    geography: Geography, save_dir: str, state: Union[int, str], year: int,
+    geography: Geography,
+    save_dir: str,
+    state: Union[int, str],
+    year: int,
+    cache: bool = False,
 ) -> str:
     """Download and extract a census shapefile for a specified geography.
     Returns the name of the extracted directory.
@@ -87,8 +91,19 @@ def get_shapefile(
     # Get the shapefile URL
     url = shapefile_urls(fips, year)[geography]
 
-    # Download and extract
-    logging.info(f"downloading... {url}")
+    # Determine name of zip file
+    full_name = url.split("/")[-1]  # e.g. "tl_2019_us_cd.zip"
+    name = full_name.split(".")[0]  # e.g. "tl_2019_us_cd"
+
+    # If it's okay to use the cached directory, check if it exists
+    # and return it if possible
+    if cache:
+        logging.debug("Using cached shapefile directory")
+        if (Path(save_dir) / name).is_dir():
+            return name
+
+    # Not using the cached file, download and extract
+    logging.info(f"Downloading shapefile from: {url}")
 
     r = requests.get(url, stream=True)
     if not r.ok:
@@ -97,9 +112,8 @@ def get_shapefile(
     with ZipFile(BytesIO(r.content)) as z:
         z.extractall(save_dir)
 
-    # Return zip file name stem
-    zip_name = url.split("/")[-1]
-    return zip_name.split(".")[0]
+    # Return name of directory extracted
+    return name
 
 
 if __name__ == "__main__":
