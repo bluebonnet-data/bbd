@@ -92,7 +92,7 @@ def get_shapefile(
 
     r = requests.get(url, stream=True)
     if not r.ok:
-        raise RuntimeError(f"Bad request. Status code: {r.status_code} {url}")
+        raise RuntimeError(f"Bad request. Status code: {r.status_code} Url: {url}")
 
     with ZipFile(BytesIO(r.content)) as z:
         z.extractall(save_dir)
