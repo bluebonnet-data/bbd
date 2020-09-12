@@ -8,6 +8,8 @@ import logging
 import us
 import requests
 
+from .geography import Geography
+
 """Maps year to congressional district number"""
 CD = {
     2019: 116,
@@ -20,18 +22,6 @@ CD = {
     2012: 113,
     2011: 112,
 }
-
-
-class Geography:
-    """Geography available for download"""
-
-    TRACT = "tract"
-    CD = "cd"
-    COUNTY = "county"
-    STATE = "state"
-    ZCTA = "zcta"
-    BLOCK = "block"
-    BLOCKGROUP = "blockgroup"
 
 
 def shapefile_urls(fips: str, year=2019) -> Dict[str, str]:
