@@ -55,7 +55,7 @@ def shapefile_urls(fips: str, year=2019) -> Dict[str, str]:
     return urls
 
 
-def download_shapefile(
+def get_shapefile(
     geography: Geography, save_dir: str, state: Union[int, str], year: int,
 ) -> str:
     """Download and extract a census shapefile for a specified geography.
@@ -106,5 +106,5 @@ if __name__ == "__main__":
     folder = Path(__file__).parent / "temp"
     state = "sc"
     year = 2019
-    name = download_shapefile(Geography.BLOCK, folder, state, year)
+    name = get_shapefile(Geography.BLOCK, folder, state, year)
     print(name)

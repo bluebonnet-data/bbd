@@ -1,3 +1,3 @@
-from .download import download_shapefile, Geography
+from .get_shapefile import get_shapefile, Geography
 
-__all__ = [download_shapefile, Geography]
+__all__ = [get_shapefile, Geography]
