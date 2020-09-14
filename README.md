@@ -153,7 +153,7 @@ Finally, we can create the leaflet map and save it to our machine.
 >>> )
 ```
 
-Simply open `path/to/save/map.html` in your browser to view your map!
+Simply open `path/to/save/map.html` in your favorite browser to view your map!
 
 ![CO Map](ext/co.png)
 
