@@ -22,7 +22,7 @@ For a running start, you can copy the [examples](examples/) folder to your machi
 Follow along with this walkthrough to learn more detailed infomation about using this library.
 
 ### Getting Census Data
-First, find the data you want to visualize. This is often easiest through the census API, and the next bit of text will read a bit like a "How to Get Census Data" tutorial. In the future there are plans to automate this process through the **bbd** library.
+First, find the data you want to visualize. This is often easiest through the census API, and the next bit of text will read a bit like a "How to Get Census Data" tutorial. There are plans to automate this process through the **bbd** library in the future.
 
 For our working example, we'll use median household income (which is coded in the census data as as "DP03_0062E").
 
