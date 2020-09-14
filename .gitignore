@@ -5,6 +5,7 @@ __pycache__
 # Dev environment
 .vscode
 .tox
+.python-version
 
 # Build
 *.egg-info
