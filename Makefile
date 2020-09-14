@@ -1,5 +1,8 @@
 .PHONY = clean test
 
+init:
+	pip install shapely pyshp folium branca requests us tox flake8 black
+
 test:
 	tox
 
