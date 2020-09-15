@@ -48,7 +48,7 @@ Now that we know which variable (or variables) we are interested in, you have a 
 ```python
 >>> from pprint import pprint
 >>>
->>> table = get_acs(state="CO", variable="D06_001", view_by=bbd.COUNTY)
+>>> table = bbd.get_acs(state="CO", variable="D06_001", view_by=bbd.COUNTY)
 >>> pprint(table)
 {
     "GEOID": [...]
@@ -58,11 +58,28 @@ Now that we know which variable (or variables) we are interested in, you have a 
 }
 ```
 
-Worth noting that whenever calls are made to big tables they (can be | are by default) cached into some set working directory (perhaps defaults to home).
+Worth noting that whenever calls are made to big tables they (can be | are by default) cached into some set working directory (perhaps defaults to home). Same goes for the shapefiles that get pulled and unzipped from the census ftp.
 
-TODO finish this up...
+Once the user has this data cached, they've taken a look at the table and know it's good stuff, they should be able to make a map using the same inputs.
 
-User could also make a map with those same inputs
+```python
+>>> table = bbd.make_acs_map(state="CO", variable="D06_001", view_by=bbd.COUNTY, save_to="map.html")
+>>> # This method should grab the same data as 'get_acs', and also pull
+>>> # the relevant shapefiles from the census ftp. (There is already a method
+>>> # to grab and unzip shapefiles from that site.) Then it'll simply join
+>>> # the data table with the shapefile on the GEOID and generate a leaflet
+>>> # map with 'make_map'
+```
 
-User could make a map with the get_acs() table and their own shapefiles if they wanted.
+Of course, if the user wanted to they could also call `make_map` on their own if they had specific processing they wanted to first do with either the shapefiles or the data
+
+```python
+>>> table = bbd.get_acs(...)
+>>> # process table
+>>>
+>>> shapefile_path = bbd.get_shapefiles(...)
+>>> # process shapefiles
+>>>
+>>> bbd.make_map(table, shapefile_path, "map.html")
+```
 
