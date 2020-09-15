@@ -20,7 +20,7 @@ D06_001			Med. Household Income	Median Household Income
 ...			...			...
 ```
 
-Ideally, it'd be nice to not specify how you want it broken down and instead have the table spit out ALL info available, with another column describing which level the data is available at.
+It'd also be nice to *not* specify how you want it broken down and instead have the table spit out ALL info available, with another column describing which level the data is available at. Not as high of priority, as this will likely require a good bit of effort.
 
 This is likely going to be a lot of information (a lot of rows in the table). Seems like you would get a lot of utility out of adding some kind of "search" or "lookup" function.
 
@@ -56,7 +56,7 @@ Now that we know which variable (or variables) we are interested in, you have a 
 }
 ```
 
-Worth noting that whenever calls are made to big tables they (can be | are by default) cached into some set working directory (perhaps defaults to home). Same goes for the shapefiles that get pulled and unzipped from the census ftp.
+Worth noting that whenever calls are made to big tables they (can be | are by default) cached into some kind of working directory (perhaps defaults to $(HOME)/.bbd/ or something). Same goes for the shapefiles that get pulled and unzipped from the census ftp.
 
 Once the user has this data cached, they've taken a look at the table and know it's good stuff, they should be able to make a map using the same inputs.
 
