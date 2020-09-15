@@ -5,8 +5,6 @@ We want for this library to "just work" and be a *really good* starting place fo
 
 ## Noah's ideal workflow
 
-This is Noah's idea of an ideal workflow.
-
 First, you'd want to explore the data available to you. For this, you'd need to specify the geography that you are interested in and how you would want the data broken down. 
 
 ```python
