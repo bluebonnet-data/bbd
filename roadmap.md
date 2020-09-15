@@ -1,5 +1,5 @@
 # Objective
-The objective of this library is to make getting and visualizing census data an easy process for the user. If the user wants something more advanced, they will probably need to dowrite some of their own mapping / coloring methods.
+The objective of this library is to make getting and visualizing census data an easy process for the user. If the user wants something more advanced, they will probably need to write some of their own mapping / coloring methods.
 
 We want for this library to "just work" and be a really good *starting place* for working with census data.
 
