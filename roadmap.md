@@ -64,12 +64,9 @@ Once the user has this data cached, they've taken a look at the table and know i
 
 ```python
 >>> table = bbd.make_acs_map(state="CO", variable="D06_001", view_by=bbd.COUNTY, save_to="map.html")
->>> # This method should grab the same data as 'get_acs', and also pull
->>> # the relevant shapefiles from the census ftp. (There is already a method
->>> # to grab and unzip shapefiles from that site.) Then it'll simply join
->>> # the data table with the shapefile on the GEOID and generate a leaflet
->>> # map with 'make_map'
 ```
+
+This method should grab the same data as `get_acs`, and also pull the relevant shapefiles from the census ftp. (There is already a method to grab and unzip shapefiles from that site.) Then it'll simply join the data table with the shapefile on the GEOID and generate a leaflet map with `make_map`.
 
 Of course, if the user wanted to they could also call `make_map` on their own if they had specific processing they wanted to first do with either the shapefiles or the data
 
