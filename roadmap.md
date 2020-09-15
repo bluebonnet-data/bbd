@@ -7,10 +7,11 @@ We want for this library to "just work" and be a really good *starting place* fo
 
 Status table of what has main functionality has already been developed
 
-Method ---------------|Description---
-`get_shapefile`       |Finds and downloads/unzips shapefiles from the census ftp site
-`make_map`            |Takes in data table, shapefile path, and constructs a nice looking leaflet map
-`misc utilitis`       |Might be useful for others, not sure what to expose
+|Method                |Description
+|----------------------|------------
+|`get_shapefile`       |Finds and downloads/unzips shapefiles from the census ftp site
+|`make_map`            |Takes in data table, shapefile path, and constructs a nice looking leaflet map
+|`misc utilitis`       |Might be useful for others, not sure what to expose
 
 ## Proposal for path forward
 
