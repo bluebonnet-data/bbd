@@ -1,15 +1,40 @@
 # Objective
-The objective of this library is to make getting and visualizing census data an easy process for the user. If the user wants something more advanced, they will probably need to write some of their own mapping / coloring methods.
+The first objective of this library is to make getting and visualizing census (and ACS) data an easy process for the user. If the user wants something more advanced, they will probably need to write some of their own mapping / coloring methods.
 
 We want for this library to "just work" and be a really good *starting place* for working with census data.
 
-## Noah's ideal workflow
+## Status
+
+Status table of what has main functionality has already been developed
+
+Method ---------------|Description---
+`get_shapefile`       |Finds and downloads/unzips shapefiles from the census ftp site
+`make_map`            |Takes in data table, shapefile path, and constructs a nice looking leaflet map
+`misc utilitis`       |Might be useful for others, not sure what to expose
+
+## Proposal for path forward
+
+Proposing that these methods (or ones that look similar) are developed are exposed to the user. Example workflow below. Note that right now this just focuses on ACS data, though the scope should probably increase to include decennial census data too.
+
+### Summary
+
+```python
+>>> import bbd
+>>> 
+>>> bbd.explore_acs(...) # View what data the ACS has to offer at a particular geography/time
+>>> bbd.explore_acs(...).search("income") # Find relevant variables within ACS data
+>>>
+>>> bbd.get_acs(...) # Get ACS data (in table-like format) for specific variable(s), geography, time
+>>> bbd.make_acs_map(...) # Generate interactive/colored leaflet map for specific variable(s), geography, time
+>>> 
+>>> bbd.make_map(...) # Generates leaflet map based on explicit data/shapefiles. Called by 'make_acs_map'
+```
+
+### Example workflow
 
 First, you'd want to explore the data available to you. For this, you'd need to specify the geography that you are interested in and how you would want the data broken down. 
 
 ```python
->>> import bbd
->>>
 >>> vars = bbd.explore_acs(state="CO", view_by=bbd.COUNTY)
 found 1560 variables for the state of Colorado, broken down by county
 
