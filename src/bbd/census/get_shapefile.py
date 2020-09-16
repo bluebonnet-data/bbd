@@ -25,6 +25,12 @@ CD = {
 
 
 def shapefile_urls(fips: str, year=2019) -> Dict[str, str]:
+    """Generates urls to shapefiles associated with a given fips code
+    on the census ftp site.
+
+    Note that these urls may not work for every year.
+    Note that these urls point to a zip file.
+    """
     try:
         cd = CD[year]
     except KeyError:
