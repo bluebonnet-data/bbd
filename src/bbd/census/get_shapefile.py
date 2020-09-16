@@ -9,6 +9,7 @@ import us
 import requests
 
 from .geography import Geography
+from ..cache import cache_
 
 """Maps year to congressional district number"""
 CD = {
@@ -53,11 +54,10 @@ def shapefile_urls(fips: str, year=2019) -> Dict[str, str]:
 
 def get_shapefile(
     geography: Geography,
-    save_dir: str,
     state: Union[int, str],
     year: int,
     cache: bool = False,
-) -> str:
+) -> Path:
     """Download and extract a census shapefile for a specified geography.
     Returns the name of the extracted directory.
 
@@ -88,33 +88,35 @@ def get_shapefile(
     url = shapefile_urls(fips, year)[geography]
 
     # Determine name of zip file
-    full_name = url.split("/")[-1]  # e.g. "tl_2019_us_cd.zip"
-    name = full_name.split(".")[0]  # e.g. "tl_2019_us_cd"
+    zip_name = url.split("/")[-1]  # e.g. "tl_2019_us_cd.zip"
+    dir_name = zip_name.split(".")[0]  # e.g. "tl_2019_us_cd"
 
     # If it's okay to use the cached directory, check if it exists
     # and return it if possible
-    if cache:
-        logging.debug("Using cached shapefile directory")
-        if (Path(save_dir) / name).is_dir():
-            return name
+    if cache and cache_.has_dir(dir_name):
+        logging.debug(f"Using cached directory: {dir_name}")
+        return dir_name
 
     # Not using the cached file, download and extract
-    logging.info(f"Downloading shapefile from: {url}")
+    save_to = cache_.make_path(dir_name)
+    logging.info(
+        "Not using chached directory. "
+        "Downloading shapefile from: {url}; to: {save_to}"
+    )
 
     r = requests.get(url, stream=True)
     if not r.ok:
         raise RuntimeError(f"Bad request. Status code: {r.status_code} Url: {url}")
 
     with ZipFile(BytesIO(r.content)) as z:
-        z.extractall(save_dir)
+        z.extractall(save_to)
 
-    # Return name of directory extracted
-    return name
+    # Return path to extracted directory
+    return save_to
 
 
 if __name__ == "__main__":
-    folder = Path(__file__).parent / "temp"
-    state = "sc"
+    cache_.set_working_directory(Path(__file__))
+    state = "CO"
     year = 2019
-    name = get_shapefile(Geography.BLOCK, folder, state, year)
-    print(name)
+    name = get_shapefile(Geography.COUNTY, state, year)
