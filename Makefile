@@ -6,7 +6,7 @@ init:
 test:
 	tox
 
-test-editable:
+local-test:
 	pip install -e .
 	pytest
 
