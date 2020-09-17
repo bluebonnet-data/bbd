@@ -11,22 +11,24 @@
 
 from pathlib import Path
 
-import bbd
+from bbd import cache, census, gis
 
 
 # Data will be downloaded to the folder this file currently resides in
 here = Path(__file__).parent
-bbd.set_working_directory(here / "data")
+cache.set_working_directory(here / "data")
 
 # In Texas, looking at 2018 ACS block groups.
 state = "tx"
 year = 2018
 
 # Download shapefiles, retreive path
-shapefile_dir = bbd.get_shapefile(bbd.Geography.BLOCKGROUP, state, year, cache=True)
+shapefile_dir = census.get_shapefile(
+    census.Geography.BLOCKGROUP, state, year, cache=True
+)
 
 # Extract and reformat census data
-data = bbd.census.extract_from_json(
+data = census.extract_from_json(
     here / "data/tx_harris_blockgroup_ethnic_origin.json",
     headers=[
         "NAME",
@@ -73,7 +75,7 @@ aliases = {
 }
 
 # Make the map!
-bbd.gis.make_map(
+gis.make_map(
     shapefile_dir,
     data,
     join_on="GEOID",
