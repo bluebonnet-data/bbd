@@ -10,7 +10,7 @@ from .utils import get_geojson_bounds
 
 
 def make_map(
-    shpf_path: str,
+    shapefile_path: Union[Path, str],
     data: dict,
     join_on: str,
     color_by: Optional[str] = None,
@@ -21,7 +21,7 @@ def make_map(
     """Creates a folium.features.GeoJson map object.
     Joins map properties with the properties in `data` and shows `data` in the map popup tooltips.
 
-    :param shpf_path: File path to shapefile. No need to include file extension.
+    :param shapefile_path: File path to shapefile. No need to include file extension.
     :param data: dict in the form of {join_on: [values], "other property": [values]}.
         If you want the tooltip properties to be displayed in any particular order,
         you can use an `OrderedDict`.
@@ -59,8 +59,16 @@ def make_map(
     if save_to is not None and map_ is None:
         map_ = folium.Map(tiles="cartodbpositron")
 
+    # If the shapefile path is a directory with a .shp file of the same name,
+    # that's okay. It is also okay to just pass in the path to the file directly.
+    p = Path(shapefile_path)
+    if p.is_dir() and (p / (p.name + ".shp")).exists():
+        shapefile_path_use = p / p.name
+    else:
+        shapefile_path_use = p
+
     # Read shapefile
-    with shapefile.Reader(str(shpf_path)) as shpf:
+    with shapefile.Reader(str(shapefile_path_use)) as shpf:
         # NOTE: This is a work-around until the shapefile.Reader.__geo_interface__
         # bug is fixed... TODO add bug report number
         geojson = {
@@ -72,7 +80,7 @@ def make_map(
     # Presently, can only operate on feature collections
     if not geojson["type"] == "FeatureCollection":
         raise AssertionError(
-            f"Shapefile {shpf_path} must be a FeatureCollection, not '{geojson['type']}''"
+            f"Shapefile {shapefile_path_use} must be a FeatureCollection, not '{geojson['type']}''"
         )
 
     # Add new data properties to geojson features
@@ -161,7 +169,7 @@ def make_map(
     # Create GeoJson map object
     geojson_map = folium.GeoJson(
         geojson,
-        name=Path(shpf_path).name,
+        name=shapefile_path_use.name,
         style_function=style_function,
         tooltip=folium.GeoJsonTooltip(fields=fields, aliases=aliases, localize=True),
     )
