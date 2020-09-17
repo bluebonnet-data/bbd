@@ -15,14 +15,14 @@ here = Path(__file__).parent
 # https://api.census.gov/data/2018/acs/acs5/profile?get=NAME,DP03_0062E&for=tract:*&in=state:08&in=county:*
 #
 # This file at that address has been downloaded and saved here:
-census_data_path = here / "co/co_larimer_tract_income.json"
+census_data_path = here / "data/co_larimer_tract_income.json"
 
 # Since we want to show data in colorado, per census tract, we can get that from this site:
 # https://www.census.gov/cgi-bin/geo/shapefiles/index.php
 #
 # Simply select the "Census Tract" layer type and the "Colorado" state. This file has
 # already been downloaded, and is saved here:
-shapefile_path = here / "co/tl_2019_08_tract"
+shapefile_path = here / "data/tl_2019_08_tract"
 
 # Right now the data is saved in a format that isn't as conducive to plotting.
 # We can extract it into a more useful format with the following command
@@ -60,5 +60,5 @@ gis.make_map(
     data,
     join_on="GEOID",
     color_by="Median Household Income",
-    save_to=here / "map.html",
+    save_to=here / "co-map.html",
 )

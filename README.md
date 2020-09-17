@@ -15,7 +15,7 @@ python -m pip install bbd
 
 ## Example
 
-For a running start, you can copy the [examples](examples/) folder to your machine and run the example python script to map median household income per census tract in Larimer county, Colorado.
+For a running start, you can copy the [examples](examples/) folder to your machine and run the example python scripts to map median household income per census tract in Larimer county, Colorado (among other things).
 
 ## Walkthrough
 
