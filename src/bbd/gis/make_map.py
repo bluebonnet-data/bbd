@@ -61,6 +61,11 @@ def make_map(
 
     # If the shapefile path is a directory with a .shp file of the same name,
     # that's okay. It is also okay to just pass in the path to the file directly.
+    #
+    # TODO should be consistent about using the working directory or absolute
+    # paths. Or, perhaps both are okay? If you pass in an absolute path, use it.
+    # If you pass in a relative path, use it relative to the working directory...?
+    # Alternatively you could just expect the user to manage the paths all on their own.
     p = Path(shapefile_path)
     if p.is_dir() and (p / (p.name + ".shp")).exists():
         shapefile_path_use = p / p.name
@@ -186,6 +191,8 @@ def make_map(
         map_.fit_bounds(get_geojson_bounds(geojson_map.data))
 
         # Ensure path exists
+        # TODO save_to path handling should be consistent with how shapefile_path
+        # is handled with respect to the working directory.
         Path(save_to).parent.mkdir(exist_ok=True, parents=True)
 
         # Save

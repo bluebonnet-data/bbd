@@ -1,5 +1,7 @@
 from pathlib import Path
 
+# TODO decide whether or not this paradime is useful
+
 
 class Cache:
     _working_directory = Path.home()
