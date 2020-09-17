@@ -15,7 +15,7 @@ clean:
 	rm -rf build dist .egg src/bbd.egg-info
 
 publish:
-	pip install 'twine>=1.5.0'
+	pip install 'twine>=1.5.0' wheel
 	python setup.py sdist bdist_wheel
 	python -m twine upload dist/*
 	rm -fr build dist .egg src/bbd.egg-info
