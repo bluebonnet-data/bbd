@@ -54,11 +54,11 @@ This census data is stored more or less as a big table in json format:
 ]
 ```
 
-We'll need to transform it into a format that is plottable. To do so, the `gis.extract_from_census_json` method should do the trick!
+We'll need to transform it into a format that is plottable. To do so, the `census.extract_from_json` method should do the trick!
 
 ```python
->>> from bbd import gis
->>> data = gis.extract_from_census_json(data_file, headers=["NAME", "GEO_ID", "DP03_0062E"])
+>>> from bbd import census
+>>> data = census.extract_from_json(data_file, headers=["NAME", "GEO_ID", "DP03_0062E"])
 >>> 
 >>> print(data)
 {

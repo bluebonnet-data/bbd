@@ -1,5 +1,5 @@
 from pathlib import Path
-from bbd import gis
+from bbd import census, gis
 
 here = Path(__file__).parent
 
@@ -26,7 +26,7 @@ shapefile_path = here / "data/tl_2019_08_tract"
 
 # Right now the data is saved in a format that isn't as conducive to plotting.
 # We can extract it into a more useful format with the following command
-data = gis.extract_from_census_json(
+data = census.extract_from_json(
     census_data_path, headers=["NAME", "DP03_0062E", "state", "county", "tract"]
 )
 

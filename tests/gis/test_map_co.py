@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from bbd import gis
+from bbd import census, gis
 
 
 data_dir = Path(__file__).parent / "shapefiles/co/"
@@ -11,7 +11,7 @@ def test_map_colorado():
     # Read congresisonal district data
     # Median household income estimate is "DP03_0062E", https://api.census.gov/data/2018/acs/acs1/profile/groups/DP03.html
     # https://api.census.gov/data/2018/acs/acs1/profile?get=group(DP03),NAME&for=congressional%20district:*&in=state:08
-    data = gis.extract_from_census_json(
+    data = census.extract_from_json(
         data_dir / "DP03_08_cd.json", headers=["NAME", "GEO_ID", "DP03_0062E"]
     )
 
@@ -50,7 +50,7 @@ def test_map_colorado_like_readme():
     # Read congresisonal district data
     # Median household income estimate is "DP03_0062E", https://api.census.gov/data/2018/acs/acs1/profile/groups/DP03.html
     # https://api.census.gov/data/2018/acs/acs1/profile?get=group(DP03),NAME&for=congressional%20district:*&in=state:08
-    data = gis.extract_from_census_json(
+    data = census.extract_from_json(
         data_dir / "DP03_08_cd.json", headers=["NAME", "GEO_ID", "DP03_0062E"]
     )
 

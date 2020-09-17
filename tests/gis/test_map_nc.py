@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from bbd import gis
+from bbd import census, gis
 
 
 data_dir = Path(__file__).parent / "shapefiles/nc/"
@@ -10,7 +10,7 @@ def test_map_nc():
 
     # Read race data per county subdivision
     # https://api.census.gov/data/2010/dec/sf1?get=group(H6),NAME&for=county:*&in=state:37
-    data = gis.extract_from_census_json(
+    data = census.extract_from_json(
         data_dir / "nc_race_by_county.json",
         headers=[
             "NAME",

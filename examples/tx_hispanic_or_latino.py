@@ -26,7 +26,7 @@ year = 2018
 shapefile_dir = bbd.get_shapefile(bbd.Geography.BLOCKGROUP, state, year, cache=True)
 
 # Extract and reformat census data
-data = bbd.gis.extract_from_census_json(
+data = bbd.census.extract_from_json(
     here / "data/tx_harris_blockgroup_ethnic_origin.json",
     headers=[
         "NAME",
