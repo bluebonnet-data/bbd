@@ -90,15 +90,15 @@ def get_shapefile(
     # Determine name of zip file
     zip_name = url.split("/")[-1]  # e.g. "tl_2019_us_cd.zip"
     dir_name = zip_name.split(".")[0]  # e.g. "tl_2019_us_cd"
+    save_to = cache_.make_path(dir_name)
 
     # If it's okay to use the cached directory, check if it exists
     # and return it if possible
     if cache and cache_.has_dir(dir_name):
         logging.debug(f"Using cached directory: {dir_name}")
-        return dir_name
+        return save_to
 
     # Not using the cached file, download and extract
-    save_to = cache_.make_path(dir_name)
     logging.info(
         "Not using chached directory. "
         "Downloading shapefile from: {url}; to: {save_to}"
