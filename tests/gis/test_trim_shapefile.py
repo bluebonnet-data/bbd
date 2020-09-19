@@ -2,7 +2,7 @@ from pathlib import Path
 
 import shapefile
 
-from bbd import census
+from bbd import gis
 
 here = Path(__file__).parent
 
@@ -17,7 +17,7 @@ def test_trim_shapefile():
         "0801",
     ]
 
-    out_path = census.trim_shapefile(in_path, join_on, include)
+    out_path = gis.trim_shapefile(in_path, join_on, include)
 
     with shapefile.Reader(str(out_path)) as r:
 
