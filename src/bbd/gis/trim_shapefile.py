@@ -10,6 +10,8 @@ from typing import Union
 
 from shapefile import Reader, Writer
 
+from .utils import resolve_shapefile_path
+
 
 def trim_shapefile(
     in_path: Union[Path, str],
@@ -22,6 +24,10 @@ def trim_shapefile(
     Shapes will be discarded unless their 'join_on' property is contained in the
     'include' list.
     """
+
+    # Resolve the shapefile path (allows in_path to point to directory with same
+    # name as nested shapefile)
+    in_path = resolve_shapefile_path(in_path)
 
     # Construct new name if it was not provided
     if out_path is None:
