@@ -6,25 +6,17 @@ from pathlib import Path
 class Cache:
     _working_directory = Path.home()
 
-    def make_path(self, relative_path) -> Path:
-        """Constructs an absolute path to a place in the filesystem relative
-        to the cache directory.
-        """
-        return self._working_directory / relative_path
+    def make_path(self, path) -> Path:
+        """If `path` is relative, this method returns it relative to the
+        `working_directory`.
 
-    def has_file(self, relative_path) -> bool:
-        """Returns true if file exists relative to the working directory,
-        else false.
+        If `path` is already absolute, it will simply be returned.
         """
-        p = self.make_path(relative_path)
-        return p.exists() and p.is_file()
-
-    def has_dir(self, relative_path) -> bool:
-        """Returns true if directory exists relative to in working directory,
-        else false.
-        """
-        p = self.make_path(relative_path)
-        return p.exists() and p.is_dir()
+        p = Path(path)
+        if p.is_absolute():
+            return p
+        else:
+            return self._working_directory / path
 
     def set_working_directory(self, path):
         """Sets the working directory. This is the directory used to cache
@@ -46,8 +38,6 @@ cache_ = Cache()
 
 
 def set_working_directory(path):
-    """Sets the working directory. This is the directory used to cache
-    datasets and shapefiles. If a file is passed in, the parent directory
-    will be used.
-    """
+    # Simple wrapper for singleton
+    __doc__ = cache_.set_working_directory.__doc__  # noqa
     cache_.set_working_directory(path)
