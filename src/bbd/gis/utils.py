@@ -112,7 +112,7 @@ def get_geojson_bounds(geojson: dict):
         )
 
 
-def resolve_shapefile_path(in_path):
+def resolve_shapefile_path(in_path) -> Path:
     """Resolves to a shapefile path.
 
     If in_path is a directory that contains a child with the same name and a '.shp'
