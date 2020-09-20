@@ -9,7 +9,7 @@ import us
 import requests
 
 from .geography import Geography
-from ..cache import cache_
+from ..working_directory import resolve_working_directory_path
 
 """Maps year to congressional district number"""
 CD = {
@@ -90,11 +90,11 @@ def get_shapefile(
     # Determine name of zip file
     zip_name = url.split("/")[-1]  # e.g. "tl_2019_us_cd.zip"
     dir_name = zip_name.split(".")[0]  # e.g. "tl_2019_us_cd"
-    save_to = cache_.make_path(dir_name)
+    save_to = resolve_working_directory_path(dir_name)
 
     # If it's okay to use the cached directory, check if it exists
     # and return it if possible
-    if cache and cache_.has_dir(dir_name):
+    if cache and save_to.is_dir() and save_to.exists():
         logging.debug(f"Using cached directory: {dir_name}")
         return save_to
 
@@ -116,7 +116,6 @@ def get_shapefile(
 
 
 if __name__ == "__main__":
-    cache_.set_working_directory(Path(__file__))
     state = "CO"
     year = 2019
     name = get_shapefile(Geography.COUNTY, state, year)
