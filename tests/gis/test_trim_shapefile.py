@@ -19,6 +19,13 @@ def test_trim_shapefile():
 
     out_path = gis.trim_shapefile(in_path, join_on, include)
 
+    # Verify trimmed shapefiles exist
+    assert out_path.with_suffix(".shp").exists()
+    assert out_path.with_suffix(".prj").exists()
+    assert out_path.with_suffix(".shx").exists()
+    assert out_path.with_suffix(".dbf").exists()
+
+    # Verify trimmed shapefile contains only the GEOIDs we asked it to include
     with shapefile.Reader(str(out_path)) as r:
 
         shape_records = r.shapeRecords()
