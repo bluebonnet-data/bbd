@@ -12,7 +12,7 @@ def trim_shapefile(
     join_on: str,
     include: list,
     out_path: Union[Path, str, None] = None,
-) -> Path:
+) -> Union[Path, str]:
     """Trims a shapefile to only include shapes that match the given criteria.
 
     Shapes will be discarded unless their 'join_on' property is contained in the
