@@ -30,4 +30,4 @@ def set_working_directory(path) -> None:
         p = input_path
 
     p.mkdir(parents=True, exist_ok=True)
-    _working_directory = p
+    _working_directory = p  # noqa
