@@ -1,7 +1,7 @@
 from pathlib import Path
 
 
-_working_directory = Path.home()
+_working_directory = Path.cwd()
 
 
 def resolve_working_directory_path(path) -> Path:
