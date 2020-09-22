@@ -12,8 +12,9 @@ def get_acs(
 ):
     """Get census acs data"""
 
-    # Convert input year to string
+    # Ensure input year is string
     year = str(year)
 
+    # If variables are passed in as a list ["a", "b", ...] then join them: "a,b,..."
     if isinstance(variables, list):
         variables = ",".join(variables)
