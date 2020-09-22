@@ -2,10 +2,7 @@ from pathlib import Path
 
 
 class _WorkingDirectory:
-    working_directory = Path.cwd()
-
-
-_wd = _WorkingDirectory
+    path = Path.cwd()
 
 
 def resolve_working_directory_path(path) -> Path:
@@ -18,7 +15,7 @@ def resolve_working_directory_path(path) -> Path:
     if p.is_absolute():
         return p
     else:
-        return _wd.working_directory / path
+        return _WorkingDirectory.path / path
 
 
 def set_working_directory(path) -> None:
@@ -34,4 +31,4 @@ def set_working_directory(path) -> None:
         p = input_path
 
     p.mkdir(parents=True, exist_ok=True)
-    _wd.working_directory = p
+    _WorkingDirectory.path = p
