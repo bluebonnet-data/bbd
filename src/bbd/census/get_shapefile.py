@@ -8,8 +8,9 @@ import logging
 import us
 import requests
 
-from .geography import Geography
 from ..working_directory import resolve_working_directory_path
+
+from .geography import Geography
 
 """Maps year to congressional district number"""
 CD = {
