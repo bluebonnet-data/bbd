@@ -112,6 +112,38 @@ def get_geojson_bounds(geojson: dict):
         )
 
 
+def resolve_shapefile_path(in_path) -> Path:
+    """Resolves to a shapefile path.
+
+    If in_path is a directory that contains a child with the same name and a '.shp'
+    extension, this method will return a path to that shapefile. Otherwise, the
+    'in_path' is returned.
+
+    This is useful because often shapefiles come in zip files (in particular from
+    the census ftp site), and thus the actual shapefile is nested within a folder
+    of the same name.
+
+    Example:
+
+        Getting census shapefile with `census.get_shapefile` will result in a
+        directory structure like so:
+            ./tl_2018_08_tract/tl_2018_08_tract.shp
+
+        However, we often only pass around a path to the parent directory:
+            ./tl_2018_08_tract/
+
+        Calling `resolve_shapefile_path` on this directory will resolve to the
+        complete shapefile path.
+            ./tl_2018_08_tract/tl_2018_08_tract.shp
+    """
+    p = Path(in_path)
+    if p.is_dir() and (p / (p.name + ".shp")).exists():
+        path_to_use = p / p.name
+    else:
+        path_to_use = p
+    return path_to_use
+
+
 if __name__ == "__main__":
     x = are_coordinates_in_shape(
         [-80.09608714445338],

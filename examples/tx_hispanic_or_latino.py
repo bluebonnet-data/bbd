@@ -55,6 +55,12 @@ data["GEOID"] = [
     )
 ]
 
+# The shapefile comes in with the entire state of texas. We want to only show the areas
+# that we have data for, i.e. we should remove all shapes that we don't have a GEOID for.
+trimmed_shapefile = gis.trim_shapefile(
+    in_path=shapefile_dir, join_on="GEOID", include=data["GEOID"]
+)
+
 # Percentage of hispanic or latino origin people out of the total respondants (to color by)
 data["% Hispanic or Latino Origin"] = [
     float(his) / float(tot) * 100 if not tot == 0 else None
@@ -76,7 +82,7 @@ aliases = {
 
 # Make the map!
 gis.make_map(
-    shapefile_dir,
+    trimmed_shapefile,
     data,
     join_on="GEOID",
     color_by="% Hispanic or Latino Origin",

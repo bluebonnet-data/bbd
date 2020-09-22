@@ -19,13 +19,16 @@ standard_data = {
 }
 
 shapefile_path = str(Path(__file__).parent / "shapefiles/fl_high_rises/fl_high_rises")
-save_path = tempfile.mktemp(suffix=".html")
 
 
 def test_make_map_joins_properly():
     data = standard_data
 
-    data_map = gis.make_map(shapefile_path, data, join_on="name",)
+    data_map = gis.make_map(
+        shapefile_path,
+        data,
+        join_on="name",
+    )
 
     geojson = data_map.data
     assert geojson["type"] == "FeatureCollection"
@@ -50,7 +53,9 @@ def test_make_map_joins_properly():
 
     data_map.add_to(m)
 
+    _, save_path = tempfile.mkstemp(suffix=".html")
     m.save(save_path)
+    Path(save_path).unlink()
 
 
 def test_make_map_exception_for_bad_join_key():
