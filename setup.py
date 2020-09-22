@@ -40,7 +40,10 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://www.bluebonnetdata.org/",
     package_dir={"": "src"},
-    packages=setuptools.find_packages(where="src", exclude=["docs", "tests*"],),
+    packages=setuptools.find_packages(
+        where="src",
+        exclude=["docs", "tests*"],
+    ),
     install_requires=requires,
     extras_require={"dev": ["flake8", "black"]},
     tests_require=["pytest"],

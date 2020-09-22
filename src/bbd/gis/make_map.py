@@ -6,7 +6,7 @@ import folium
 import branca
 
 from .magic import Magic
-from .utils import get_geojson_bounds
+from .utils import get_geojson_bounds, resolve_shapefile_path
 
 
 def make_map(
@@ -61,16 +61,12 @@ def make_map(
 
     # If the shapefile path is a directory with a .shp file of the same name,
     # that's okay. It is also okay to just pass in the path to the file directly.
-    #
+    shapefile_path_use = resolve_shapefile_path(shapefile_path)
+
     # TODO should be consistent about using the working directory or absolute
     # paths. Or, perhaps both are okay? If you pass in an absolute path, use it.
     # If you pass in a relative path, use it relative to the working directory...?
     # Alternatively you could just expect the user to manage the paths all on their own.
-    p = Path(shapefile_path)
-    if p.is_dir() and (p / (p.name + ".shp")).exists():
-        shapefile_path_use = p / p.name
-    else:
-        shapefile_path_use = p
 
     # Read shapefile
     with shapefile.Reader(str(shapefile_path_use)) as shpf:
