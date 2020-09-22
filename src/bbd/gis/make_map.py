@@ -5,6 +5,8 @@ import shapefile
 import folium
 import branca
 
+from ..working_directory import resolve_working_directory_path
+
 from .magic import Magic
 from .utils import get_geojson_bounds, resolve_shapefile_path
 
@@ -59,17 +61,15 @@ def make_map(
     if save_to is not None and map_ is None:
         map_ = folium.Map(tiles="cartodbpositron")
 
+    # Allow shapefile path to be relative to working directory
+    shapefile_path = resolve_working_directory_path(shapefile_path)
+
     # If the shapefile path is a directory with a .shp file of the same name,
     # that's okay. It is also okay to just pass in the path to the file directly.
-    shapefile_path_use = resolve_shapefile_path(shapefile_path)
-
-    # TODO should be consistent about using the working directory or absolute
-    # paths. Or, perhaps both are okay? If you pass in an absolute path, use it.
-    # If you pass in a relative path, use it relative to the working directory...?
-    # Alternatively you could just expect the user to manage the paths all on their own.
+    shapefile_path = resolve_shapefile_path(shapefile_path)
 
     # Read shapefile
-    with shapefile.Reader(str(shapefile_path_use)) as shpf:
+    with shapefile.Reader(str(shapefile_path)) as shpf:
         # NOTE: This is a work-around until the shapefile.Reader.__geo_interface__
         # bug is fixed... TODO add bug report number
         geojson = {
@@ -81,7 +81,7 @@ def make_map(
     # Presently, can only operate on feature collections
     if not geojson["type"] == "FeatureCollection":
         raise AssertionError(
-            f"Shapefile {shapefile_path_use} must be a FeatureCollection, not '{geojson['type']}''"
+            f"Shapefile {shapefile_path} must be a FeatureCollection, not '{geojson['type']}''"
         )
 
     # Add new data properties to geojson features
@@ -170,7 +170,7 @@ def make_map(
     # Create GeoJson map object
     geojson_map = folium.GeoJson(
         geojson,
-        name=shapefile_path_use.name,
+        name=shapefile_path.name,
         style_function=style_function,
         tooltip=folium.GeoJsonTooltip(fields=fields, aliases=aliases, localize=True),
     )
@@ -186,9 +186,10 @@ def make_map(
         # Fit bounds to the GeoJson shapes
         map_.fit_bounds(get_geojson_bounds(geojson_map.data))
 
+        # Allow save_to to be relative to working directory
+        save_to = resolve_working_directory_path(save_to)
+
         # Ensure path exists
-        # TODO save_to path handling should be consistent with how shapefile_path
-        # is handled with respect to the working directory.
         Path(save_to).parent.mkdir(exist_ok=True, parents=True)
 
         # Save
