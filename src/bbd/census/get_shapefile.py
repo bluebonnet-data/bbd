@@ -8,7 +8,7 @@ import logging
 import us
 import requests
 
-from ..working_directory import resolve_working_directory_path
+from ..working_directory import working_directory
 
 from .geography import Geography
 
@@ -91,7 +91,7 @@ def get_shapefile(
     # Determine name of zip file
     zip_name = url.split("/")[-1]  # e.g. "tl_2019_us_cd.zip"
     dir_name = zip_name.split(".")[0]  # e.g. "tl_2019_us_cd"
-    save_to = resolve_working_directory_path(dir_name)
+    save_to = working_directory.resolve(dir_name)
 
     # If it's okay to use the cached directory, check if it exists
     # and return it if possible

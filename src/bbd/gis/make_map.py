@@ -5,7 +5,7 @@ import shapefile
 import folium
 import branca
 
-from ..working_directory import resolve_working_directory_path
+from ..working_directory import working_directory
 
 from .magic import Magic
 from .utils import get_geojson_bounds, resolve_shapefile_path
@@ -62,7 +62,7 @@ def make_map(
         map_ = folium.Map(tiles="cartodbpositron")
 
     # Allow shapefile path to be relative to working directory
-    shapefile_path = resolve_working_directory_path(shapefile_path)
+    shapefile_path = working_directory.resolve(shapefile_path)
 
     # If the shapefile path is a directory with a .shp file of the same name,
     # that's okay. It is also okay to just pass in the path to the file directly.
@@ -187,7 +187,7 @@ def make_map(
         map_.fit_bounds(get_geojson_bounds(geojson_map.data))
 
         # Allow save_to to be relative to working directory
-        save_to = resolve_working_directory_path(save_to)
+        save_to = working_directory.resolve(save_to)
 
         # Ensure path exists
         Path(save_to).parent.mkdir(exist_ok=True, parents=True)

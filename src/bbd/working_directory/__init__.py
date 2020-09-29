@@ -1,3 +1,3 @@
-from .working_directory import set_working_directory, resolve_working_directory_path
+from .working_directory import working_directory
 
-__all__ = [set_working_directory, resolve_working_directory_path]
+__all__ = [working_directory]
