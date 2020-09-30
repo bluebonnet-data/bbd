@@ -1,7 +1,7 @@
 from bbd import census
 
 
-census.api_key.key = ""
+census.api_key.key = "MyApiKey"
 
 
 def test_call():
@@ -10,9 +10,12 @@ def test_call():
     year = 2018
     dataset = census.DataSets.ACS5_DETAIL
 
-    call = census.get_acs(geography, variables, year, dataset)
+    call = census.construct_api_call(geography, variables, year, dataset)
 
-    return call
+    assert (
+        call
+        == "https://api.census.gov/data/2018/acs/acs5?get=B03003_001E&for=state:*&key=MyApiKey"
+    )
 
 
 if __name__ == "__main__":

@@ -14,6 +14,21 @@ def get_acs(
     county: Union[str, None] = None,
 ):
     """Get census acs data"""
+    call = construct_api_call(geography, variables, year, dataset, state, county)
+
+    # TODO return the call's contents
+    return call
+
+
+def construct_api_call(
+    geography: Geography,
+    variables: Union[str, List[str]],
+    year: Union[str, int] = 2018,
+    dataset: DataSets = DataSets.ACS5_DETAIL,
+    state: Union[str, None] = None,
+    county: Union[str, None] = None,
+):
+    """Construct a url call to the census api"""
 
     # If variables are passed in as a list ["a", "b", ...] then join them: "a,b,..."
     if isinstance(variables, list):
@@ -34,11 +49,9 @@ def get_acs(
     else:
         in_county = ""
 
-    # Base api call
-    base_call = (
+    # Census api call
+    return (
         f"https://api.census.gov/data/{year}/{dataset}"
         f"?get={variables}{for_geography}{in_state}{in_county}"
         f"&key={api_key.key}"
     )
-
-    print(base_call)
