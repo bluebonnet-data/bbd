@@ -1,11 +1,17 @@
 import json
 
 
-def extract_from_json(fp, headers: list) -> dict:
+def load_json_file(fp, headers: list) -> dict:
     """Extract column data for the requested headers"""
 
     with open(fp, "r") as f:
         data = json.load(f)
+
+    return load_json(data, headers)
+
+
+def load_json(data: str, headers: list) -> dict:
+    """Extract column data for the requested headers"""
 
     # Top row is header row
     all_headers = data[0]

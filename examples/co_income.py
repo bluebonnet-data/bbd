@@ -26,7 +26,7 @@ shapefile_path = here / "data/tl_2019_08_tract"
 
 # Right now the data is saved in a format that isn't as conducive to plotting.
 # We can extract it into a more useful format with the following command
-data = census.extract_from_json(
+data = census.load_json_file(
     census_data_path, headers=["NAME", "DP03_0062E", "state", "county", "tract"]
 )
 

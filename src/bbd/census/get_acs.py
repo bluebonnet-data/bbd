@@ -1,4 +1,8 @@
+import re
+import json
 from typing import Union, List
+
+import requests
 
 from .geography import Geography
 from .datasets import DataSets
@@ -12,12 +16,40 @@ def get_acs(
     dataset: DataSets = DataSets.ACS5_DETAIL,
     state: Union[str, None] = None,
     county: Union[str, None] = None,
+    cache: bool = False,
 ):
     """Get census acs data"""
     call = construct_api_call(geography, variables, year, dataset, state, county)
 
-    # TODO return the call's contents
-    return call
+    r = requests.get(call, stream=True)
+    if not r.ok:
+        raise RuntimeError(
+            "Bad request. "
+            f"Status code: {r.status_code}; Call: {call}; Content: {r.content}"
+        )
+
+    content = r.content
+    jcontent = json.loads(content)
+
+    if cache is True:
+        pass
+        # save the content
+
+    return jcontent
+
+
+def url_to_filename(url: str) -> str:
+    """Converts url to a filename by removing invalid filename characters
+
+    Note that this will not always work since windows has very particular file
+    naming rules.
+    """
+
+    # Replace "*", used as geography wildcard, with "all"
+    url.replace("*", "all")
+
+    # Only keep letters, numbers, or _, ., -
+    return "".join(re.findall("[a-zA-Z0-9_.-]*", url))
 
 
 def construct_api_call(

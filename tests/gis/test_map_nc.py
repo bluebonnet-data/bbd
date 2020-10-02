@@ -10,7 +10,7 @@ def test_map_nc():
 
     # Read race data per county subdivision
     # https://api.census.gov/data/2010/dec/sf1?get=group(H6),NAME&for=county:*&in=state:37
-    data = census.extract_from_json(
+    data = census.load_json_file(
         data_dir / "nc_race_by_county.json",
         headers=[
             "NAME",

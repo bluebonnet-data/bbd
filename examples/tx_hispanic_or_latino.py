@@ -28,7 +28,7 @@ shapefile_dir = census.get_shapefile(
 )
 
 # Extract and reformat census data
-data = census.extract_from_json(
+data = census.load_json_file(
     here / "data/tx_harris_blockgroup_ethnic_origin.json",
     headers=[
         "NAME",
