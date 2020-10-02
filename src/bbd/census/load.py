@@ -23,12 +23,12 @@ def organize(data: dict, headers: list = None) -> dict:
     # Top row is header row
     all_headers = data[0]
 
-    # Get indexes for each requested header. If there are no requested headers, get
-    # all of the data available.
+    # If there are no requested headers, get all of the data available.
     if headers is None:
-        indexes = [i for i in range(all_headers)]
-    else:
-        indexes = [all_headers.index(h) for h in headers]
+        headers = all_headers
+
+    # Get indexes for each requested header.
+    indexes = [all_headers.index(h) for h in headers]
 
     # Construct data container
     d = {h: [] for h in headers}
