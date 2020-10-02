@@ -4,9 +4,12 @@ from typing import Union, List
 
 import requests
 
+from ..working_directory import working_directory
+
 from .geography import Geography
 from .datasets import DataSets
 from .api_key import api_key
+from .load import load_json_str
 
 
 def get_acs(
@@ -21,6 +24,11 @@ def get_acs(
     """Get census acs data"""
     call = construct_api_call(geography, variables, year, dataset, state, county)
 
+    save_file = working_directory.resolve(url_to_filename(call))
+
+    if cache is True and save_file.exists() and save_file.is_file():
+        return json.load(save_file)
+
     r = requests.get(call, stream=True)
     if not r.ok:
         raise RuntimeError(
@@ -28,14 +36,12 @@ def get_acs(
             f"Status code: {r.status_code}; Call: {call}; Content: {r.content}"
         )
 
-    content = r.content
-    jcontent = json.loads(content)
+    content = load_json_str(r.content)
 
     if cache is True:
-        pass
-        # save the content
+        json.dump(content, save_file)
 
-    return jcontent
+    return content
 
 
 def url_to_filename(url: str) -> str:
