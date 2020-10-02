@@ -7,10 +7,17 @@ def load_json_file(fp, headers: list) -> dict:
     with open(fp, "r") as f:
         data = json.load(f)
 
-    return load_json(data, headers)
+    return organize(data, headers)
 
 
-def load_json(data: str, headers: list) -> dict:
+def load_json_str(s: str, headers: list) -> dict:
+    """Extract column data for the requested headers"""
+
+    data = json.loads(s)
+    return organize(data, headers)
+
+
+def organize(data: dict, headers: list) -> dict:
     """Extract column data for the requested headers"""
 
     # Top row is header row
