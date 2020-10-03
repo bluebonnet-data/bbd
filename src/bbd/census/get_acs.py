@@ -1,5 +1,4 @@
 import re
-import json
 from typing import Union, List
 
 import requests
@@ -9,7 +8,7 @@ from ..working_directory import working_directory
 from .geography import Geography
 from .datasets import DataSets
 from .api_key import api_key
-from .load import load_json_str
+from .load import load_json_str, load_json_file
 from .us import state_to_fips
 
 
@@ -28,8 +27,7 @@ def get_acs(
     save_file = working_directory.resolve(url_to_filename(call)).with_suffix(".json")
 
     if cache is True and save_file.exists() and save_file.is_file():
-        with open(save_file, "r") as f:
-            return json.load(f)
+        return load_json_file(save_file)
 
     r = requests.get(call, stream=True)
     if not r.ok:
@@ -42,7 +40,7 @@ def get_acs(
 
     if cache is True:
         with open(save_file, "w") as f:
-            json.dump(content, f, indent=4)
+            f.write(r.text)
 
     return content
 
