@@ -4,7 +4,7 @@ import shapefile
 
 from bbd import gis
 
-here = Path(__file__).parent
+here = Path(__file__).parent.absolute()
 
 
 def test_trim_shapefile():

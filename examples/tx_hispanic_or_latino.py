@@ -15,7 +15,7 @@ from bbd import cache, census, gis
 
 
 # Data will be downloaded to the folder this file currently resides in
-here = Path(__file__).parent
+here = Path(__file__).parent.absolute()
 cache.set_working_directory(here / "data")
 
 # In Texas, looking at 2018 ACS block groups.

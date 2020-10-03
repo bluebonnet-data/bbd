@@ -2,7 +2,7 @@ from pathlib import Path
 from bbd import census, gis, working_directory
 
 
-here = Path(__file__).parent
+here = Path(__file__).parent.absolute()
 working_directory.path = here / "data"
 
 api_key_file = here.parent / "user/census_api_key.txt"
