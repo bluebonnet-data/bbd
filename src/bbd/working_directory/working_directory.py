@@ -23,6 +23,11 @@ class _WorkingDirectory:
         else:
             p = input_path
 
+        if not p.is_absolute():
+            raise ValueError(
+                f"Working directory must be set to an absolute path, not: {p}"
+            )
+
         p.mkdir(parents=True, exist_ok=True)
         self._path = p
 
