@@ -21,14 +21,13 @@ with open(api_key_file, "r") as f:
 # https://api.census.gov/data/2018/acs/acs5/profile?get=NAME,DP03_0062E&for=tract:*&in=state:08&in=county:*
 #
 # We can retreive that data with the following call
-# (also saved here... "data/co_larimer_tract_income.json")
 data = census.get_acs(
     geography=census.Geography.TRACT,
     variables=["NAME", "DP03_0062E"],
     year=2018,
     dataset=census.DataSets.ACS5_PROFILE,
     state="co",
-    county="*",
+    county="069",  # Larimer County
     cache=True,
 )
 
