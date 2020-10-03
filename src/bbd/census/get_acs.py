@@ -10,6 +10,7 @@ from .geography import Geography
 from .datasets import DataSets
 from .api_key import api_key
 from .load import load_json_str
+from .us import state_to_fips
 
 
 def get_acs(
@@ -24,10 +25,11 @@ def get_acs(
     """Get census acs data"""
     call = construct_api_call(geography, variables, year, dataset, state, county)
 
-    save_file = working_directory.resolve(url_to_filename(call))
+    save_file = working_directory.resolve(url_to_filename(call)).with_suffix(".json")
 
     if cache is True and save_file.exists() and save_file.is_file():
-        return json.load(save_file)
+        with open(save_file, "r") as f:
+            return json.load(f)
 
     r = requests.get(call, stream=True)
     if not r.ok:
@@ -39,7 +41,8 @@ def get_acs(
     content = load_json_str(r.content)
 
     if cache is True:
-        json.dump(content, save_file)
+        with open(save_file, "w") as f:
+            json.dump(content, f, indent=4)
 
     return content
 
@@ -52,7 +55,10 @@ def url_to_filename(url: str) -> str:
     """
 
     # Replace "*", used as geography wildcard, with "all"
-    url.replace("*", "all")
+    url = url.replace("*", "all")
+
+    # Remove the beginning of the call since it is always the same
+    url = url.replace("https://api.census.gov/data/", "")
 
     # Remove the api key if present
     key_index = url.find("key")
@@ -82,7 +88,7 @@ def construct_api_call(
 
     # If a state is provided, request the data returned be within it
     if state is not None:
-        in_state = f"&in=state:{state}"
+        in_state = f"&in=state:{state_to_fips(state)}"
     else:
         in_state = ""
 
