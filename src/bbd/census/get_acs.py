@@ -54,6 +54,11 @@ def url_to_filename(url: str) -> str:
     # Replace "*", used as geography wildcard, with "all"
     url.replace("*", "all")
 
+    # Remove the api key if present
+    key_index = url.find("key")
+    if key_index != -1:
+        url = url[:key_index]
+
     # Only keep letters, numbers, or _, ., -
     return "".join(re.findall("[a-zA-Z0-9_.-]*", url))
 
