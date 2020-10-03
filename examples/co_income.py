@@ -1,7 +1,13 @@
 from pathlib import Path
-from bbd import census, gis
+from bbd import census, gis, working_directory
+
 
 here = Path(__file__).parent
+working_directory.path = here / "data"
+
+api_key_file = here.parent / "user/census_api_key.txt"
+with open(api_key_file, "r") as f:
+    census.api_key.key = f.readlines()[0]
 
 # Say you were interested in median household income in colorado, per census tract.
 # A good place to start looking for that data is on the census data set website:
@@ -14,20 +20,27 @@ here = Path(__file__).parent
 # For reference, you can use the following census API call to get that data.
 # https://api.census.gov/data/2018/acs/acs5/profile?get=NAME,DP03_0062E&for=tract:*&in=state:08&in=county:*
 #
-# This file at that address has been downloaded and saved here:
-census_data_path = here / "data/co_larimer_tract_income.json"
+# We can retreive that data with the following call
+# (also saved here... "data/co_larimer_tract_income.json")
+data = census.get_acs(
+    geography=census.Geography.TRACT,
+    variables=["NAME", "DP03_0062E"],
+    year=2018,
+    dataset=census.DataSets.ACS5_PROFILE,
+    state="co",
+    county="*",
+    cache=True,
+)
 
 # Since we want to show data in colorado, per census tract, we can get that from this site:
 # https://www.census.gov/cgi-bin/geo/shapefiles/index.php
 #
-# Simply select the "Census Tract" layer type and the "Colorado" state. This file has
-# already been downloaded, and is saved here:
-shapefile_path = here / "data/tl_2019_08_tract"
-
-# Right now the data is saved in a format that isn't as conducive to plotting.
-# We can extract it into a more useful format with the following command
-data = census.load_json_file(
-    census_data_path, headers=["NAME", "DP03_0062E", "state", "county", "tract"]
+# We can also retreive it automatically with the following call
+shapefile_path = census.get_shapefile(
+    geography=census.Geography.TRACT,
+    state="co",
+    year=2019,
+    cache=True,
 )
 
 # The shapefile GEOID is coded with 11 digits (STATE:2 + COUNTY:3 + TRACT:6 = GEOID:11)
