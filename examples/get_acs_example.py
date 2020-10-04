@@ -10,11 +10,11 @@ api_key_file = Path(__file__).parent.parent / "user/census_api_key.txt"
 with open(api_key_file, "r") as f:
     census.api_key.key = f.readlines()[0]
 
-geography = census.Geography.STATE
-variables = "B03003_001E"
-year = 2018
-dataset = census.DataSets.ACS5_DETAIL
-
-data = census.get_acs(geography, variables, year, dataset)
+data = census.get_acs(
+    geography=census.Geography.STATE,
+    variables="NAME,B03003_001E",
+    year=2018,
+    dataset=census.DataSets.ACS5_DETAIL,
+)
 
 pprint(data)
