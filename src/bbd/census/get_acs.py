@@ -31,9 +31,14 @@ def get_acs(
 
     r = requests.get(call, stream=True)
     if not r.ok:
-        raise RuntimeError(
+        raise ValueError(
             "Bad request. "
             f"Status code: {r.status_code}; Call: {call}; Content: {r.content}"
+        )
+
+    if "<html>" in r.text:
+        raise ValueError(
+            f"Census API returned html response -- expected json. Response: {r.text}"
         )
 
     content = load_json_str(r.content)
