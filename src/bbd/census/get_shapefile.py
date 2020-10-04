@@ -47,7 +47,7 @@ def shapefile_urls(fips: str, year=2019) -> Dict[str, str]:
         "state": urljoin(base, f"STATE/tl_{year}_us_state.zip"),
         "zcta": urljoin(base, f"ZCTA5/tl_{year}_{fips}_zcta5.zip"),
         "block": urljoin(base, f"TABBLOCK/tl_{year}_{fips}_tabblock10.zip"),  # 14-19
-        "blockgroup": urljoin(base, f"BG/tl_{year}_{fips}_bg.zip"),
+        "block group": urljoin(base, f"BG/tl_{year}_{fips}_bg.zip"),
     }
 
     return urls

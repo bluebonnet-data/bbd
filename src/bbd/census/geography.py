@@ -7,4 +7,4 @@ class Geography:
     STATE = "state"
     ZCTA = "zcta"
     BLOCK = "block"
-    BLOCKGROUP = "blockgroup"
+    BLOCKGROUP = "block group"
