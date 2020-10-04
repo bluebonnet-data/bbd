@@ -11,35 +11,35 @@
 
 from pathlib import Path
 
-from bbd import cache, census, gis
+from bbd import census, gis, working_directory
 
 
-# Data will be downloaded to the folder this file currently resides in
-here = Path(__file__).parent
-cache.set_working_directory(here / "data")
+# Set the working directory (where files get stored)
+here = Path(__file__).parent.absolute()
+working_directory.path = here / "data"
+
+# Save api key as the first line of a `census_api_key.txt` file in this directory
+api_key_file = here / "census_api_key.txt"
+with open(api_key_file, "r") as f:
+    census.api_key.key = f.readlines()[0]
 
 # In Texas, looking at 2018 ACS block groups.
-state = "tx"
-year = 2018
-
-# Download shapefiles, retreive path
 shapefile_dir = census.get_shapefile(
-    census.Geography.BLOCKGROUP, state, year, cache=True
+    geography=census.Geography.BLOCKGROUP,
+    state="tx",
+    year=2018,
+    cache=True,
 )
 
 # Extract and reformat census data
-data = census.extract_from_json(
-    here / "data/tx_harris_blockgroup_ethnic_origin.json",
-    headers=[
-        "NAME",
-        "B03003_001E",
-        "B03003_002E",
-        "B03003_003E",
-        "state",
-        "county",
-        "tract",
-        "block group",
-    ],
+data = census.get_acs(
+    geography=census.Geography.BLOCKGROUP,
+    variables=["NAME", "B03003_001E", "B03003_002E", "B03003_003E"],
+    year=2018,
+    dataset=census.DataSets.ACS5_DETAIL,
+    state="tx",
+    county="201",  # Harris County
+    cache=True,
 )
 
 # The shapefile GEOID is coded with 11 digits (STATE:2 + COUNTY:3 + TRACT:6 + BLOCK_GROUP:1 = GEOID:12)
@@ -54,12 +54,6 @@ data["GEOID"] = [
         data["state"], data["county"], data["tract"], data["block group"]
     )
 ]
-
-# The shapefile comes in with the entire state of texas. We want to only show the areas
-# that we have data for, i.e. we should remove all shapes that we don't have a GEOID for.
-trimmed_shapefile = gis.trim_shapefile(
-    in_path=shapefile_dir, join_on="GEOID", include=data["GEOID"]
-)
 
 # Percentage of hispanic or latino origin people out of the total respondants (to color by)
 data["% Hispanic or Latino Origin"] = [
@@ -82,10 +76,11 @@ aliases = {
 
 # Make the map!
 gis.make_map(
-    trimmed_shapefile,
+    shapefile_dir,
     data,
     join_on="GEOID",
     color_by="% Hispanic or Latino Origin",
     include=aliases,
     save_to=here / "tx-map.html",
+    trim=True,
 )

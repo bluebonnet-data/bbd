@@ -14,3 +14,18 @@ build
 
 # User files
 user
+
+# Shapefiles
+*.dbf
+*.prj
+*.shp
+*.shx
+*.iso.xml
+*.cpg
+
+# Data files
+*.json
+*.html
+
+# Shh, secrets
+census_api_key.txt
