@@ -2,7 +2,7 @@ class Geography:
     """Geography available for download"""
 
     TRACT = "tract"
-    CD = "cd"
+    CD = "congressional district"
     COUNTY = "county"
     STATE = "state"
     ZCTA = "zcta"

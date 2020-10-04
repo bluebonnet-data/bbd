@@ -42,7 +42,7 @@ def shapefile_urls(fips: str, year=2019) -> Dict[str, str]:
     base = f"https://www2.census.gov/geo/tiger/TIGER{year}/"
     urls = {
         "tract": urljoin(base, f"TRACT/tl_{year}_{fips}_tract.zip"),  # 2019
-        "cd": urljoin(base, f"CD/tl_{year}_us_cd{cd}.zip"),  # 2019
+        "congressional district": urljoin(base, f"CD/tl_{year}_us_cd{cd}.zip"),  # 2019
         "county": urljoin(base, f"COUNTY/tl_{year}_us_county.zip"),
         "state": urljoin(base, f"STATE/tl_{year}_us_state.zip"),
         "zcta": urljoin(base, f"ZCTA5/tl_{year}_{fips}_zcta5.zip"),
