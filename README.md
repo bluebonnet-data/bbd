@@ -22,14 +22,21 @@ For a running start, you can copy the [examples](examples/) folder to your machi
 Follow along with this walkthrough to learn more detailed infomation about using this library.
 
 ### Getting Census Data
-First, find the data you want to visualize. This is often easiest through the census API, and the next bit of text will read a bit like a "How to Get Census Data" tutorial. There are plans to automate this process through the **bbd** library in the future.
+First, find the data you want to visualize. This is often easiest through the census API, and the next bit of text will read a bit like a "How to Get Census Data" tutorial.
 
 For our working example, we'll use median household income (which is coded in the census data as as "DP03_0062E").
 
-We can simply downloaded the json data from [here](https://api.census.gov/data/2018/acs/acs1/profile?get=group(DP03),NAME&for=congressional%20district:*&in=state:08) and save it to your machine.
+We can simply downloaded the census data like so:
 
 ```python
->>> census_json_path = "path/to/DP03_08_cd.json"
+>>> from bbd import census
+>>> data = census.get_acs(
+>>>    geography=census.Geography.CD,
+>>>    variables="group(DP03),NAME",
+>>>    year=2018,
+>>>    state="co",
+>>>    dataset=census.DataSets.ACS5_PROFILE,
+>>> )
 ```
 
     https://api.census.gov/data/2018/acs/acs1/profile?get=group(DP03),NAME&for=congressional%20district:*&in=state:08
@@ -54,12 +61,9 @@ This census data is stored more or less as a big table in json format:
 ]
 ```
 
-We'll need to transform it into a format that is plottable. To do so, the `census.load_json_file` method should do the trick!
+When you request it from the API with `get_acs`, it is automatically converted to a format that is plottable and join-able with shapefiles. If you downloaded the file manually and want to convert it yourself, you can use `census.load_json_file`.
 
 ```python
->>> from bbd import census
->>> data = census.load_json_file(data_file, headers=["NAME", "GEO_ID", "DP03_0062E"])
->>> 
 >>> print(data)
 {
     "NAME": ["Congressional District 1", "Congressional District 2", ...],
@@ -70,16 +74,18 @@ We'll need to transform it into a format that is plottable. To do so, the `censu
 
 ### Getting Shapefiles
 
-Luckily, the census provides shapefiles for pretty much every `GEO_ID` you can find in the census API.
-
-Just head to [this website](https://www.census.gov/cgi-bin/geo/shapefiles/index.php) and select the relevent geography/location.
-
-E.g. since we are looking for Congressional Districts, you can simply select that in the dropdown and download the corresponding shapefile and save it to your machine.
+Luckily, the census provides shapefiles for pretty much every `GEO_ID` you can find in the census API. You can automatically download them like this:
 
 ```python
->>> # Note: I went ahead and removed all but the Colorado (state 08) shapes, but that's optional
->>> shapefile_path = "path/to/tl_2019_08_cd116"
+>>> shapefile_path = census.get_shapefile(
+>>>     geography=census.Geography.CD,
+>>>     state="co",
+>>>     year=2018,
+>>>     cache=True,
+>>> )
 ```
+
+To get these files manually, just head to [this website](https://www.census.gov/cgi-bin/geo/shapefiles/index.php) and select the relevent geography/location.
 
 ### Match Census Data GEO ID to Shapefile GEO ID
 
