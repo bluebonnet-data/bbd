@@ -11,35 +11,31 @@
 
 from pathlib import Path
 
-from bbd import cache, census, gis
+from bbd import census, gis, working_directory
 
 
-# Data will be downloaded to the folder this file currently resides in
+# Set the working directory (where files get stored)
 here = Path(__file__).parent.absolute()
-cache.set_working_directory(here / "data")
+working_directory.path = here / "data"
+
+api_key_file = here.parent / "user/census_api_key.txt"
+with open(api_key_file, "r") as f:
+    census.api_key.key = f.readlines()[0]
 
 # In Texas, looking at 2018 ACS block groups.
-state = "tx"
-year = 2018
-
-# Download shapefiles, retreive path
 shapefile_dir = census.get_shapefile(
-    census.Geography.BLOCKGROUP, state, year, cache=True
+    census.Geography.BLOCKGROUP, "tx", 2018, cache=True
 )
 
 # Extract and reformat census data
-data = census.load_json_file(
-    here / "data/tx_harris_blockgroup_ethnic_origin.json",
-    headers=[
-        "NAME",
-        "B03003_001E",
-        "B03003_002E",
-        "B03003_003E",
-        "state",
-        "county",
-        "tract",
-        "block group",
-    ],
+data = census.get_acs(
+    geography=census.Geography.BLOCKGROUP,
+    variables=["NAME", "B03003_001E", "B03003_002E", "B03003_003E"],
+    year=2018,
+    dataset=census.DataSets.ACS5_DETAIL,
+    state="tx",
+    county="201",  # Harris County
+    cache=True,
 )
 
 # The shapefile GEOID is coded with 11 digits (STATE:2 + COUNTY:3 + TRACT:6 + BLOCK_GROUP:1 = GEOID:12)
