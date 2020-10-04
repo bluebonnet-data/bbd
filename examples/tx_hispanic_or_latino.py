@@ -24,7 +24,10 @@ with open(api_key_file, "r") as f:
 
 # In Texas, looking at 2018 ACS block groups.
 shapefile_dir = census.get_shapefile(
-    census.Geography.BLOCKGROUP, "tx", 2018, cache=True
+    geography=census.Geography.BLOCKGROUP,
+    state="tx",
+    year=2018,
+    cache=True,
 )
 
 # Extract and reformat census data
