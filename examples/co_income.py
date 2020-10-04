@@ -5,7 +5,8 @@ from bbd import census, gis, working_directory
 here = Path(__file__).parent.absolute()
 working_directory.path = here / "data"
 
-api_key_file = here.parent / "user/census_api_key.txt"
+# Save api key as the first line of a `census_api_key.txt` file in this directory
+api_key_file = here / "census_api_key.txt"
 with open(api_key_file, "r") as f:
     census.api_key.key = f.readlines()[0]
 

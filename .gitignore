@@ -26,3 +26,6 @@ user
 # Data files
 *.json
 *.html
+
+# Shh, secrets
+census_api_key.txt
