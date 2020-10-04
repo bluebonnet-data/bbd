@@ -14,3 +14,12 @@ build
 
 # User files
 user
+
+# Shapefiles
+*.dbf
+*.prj
+*.shp
+*.shx
+
+# Data files
+*.json
