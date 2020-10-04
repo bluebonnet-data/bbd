@@ -9,6 +9,7 @@ from ..working_directory import working_directory
 
 from .magic import Magic
 from .utils import get_geojson_bounds, resolve_shapefile_path
+from .trim_shapefile import trim_shapefile
 
 
 def make_map(
@@ -19,6 +20,7 @@ def make_map(
     include: Optional[Union[list, dict]] = None,
     map_: Optional[folium.Map] = None,
     save_to: Optional[Union[str, Path]] = None,
+    trim: Optional[bool] = False,
 ):
     """Creates a folium.features.GeoJson map object.
     Joins map properties with the properties in `data` and shows `data` in the map popup tooltips.
@@ -67,6 +69,10 @@ def make_map(
     # If the shapefile path is a directory with a .shp file of the same name,
     # that's okay. It is also okay to just pass in the path to the file directly.
     shapefile_path = resolve_shapefile_path(shapefile_path)
+
+    # Trim the shapefile if requested
+    if trim is True:
+        shapefile_path = trim_shapefile(shapefile_path, join_on, joiner)
 
     # Read shapefile
     with shapefile.Reader(str(shapefile_path)) as shpf:
