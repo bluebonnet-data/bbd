@@ -20,6 +20,8 @@ user
 *.prj
 *.shp
 *.shx
+*.iso.xml
+*.cpg
 
 # Data files
 *.json
