@@ -5,6 +5,7 @@
 
 class Magic:
     MISSING_VALUES = [
+        None,
         -999999999,
         -888888888,
         -666666666,
