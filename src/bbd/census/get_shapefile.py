@@ -45,7 +45,7 @@ def shapefile_urls(fips: str, year=2019) -> Dict[str, str]:
         "congressional district": urljoin(base, f"CD/tl_{year}_us_cd{cd}.zip"),  # 2019
         "county": urljoin(base, f"COUNTY/tl_{year}_us_county.zip"),
         "state": urljoin(base, f"STATE/tl_{year}_us_state.zip"),
-        "zcta": urljoin(base, f"ZCTA5/tl_{year}_{fips}_zcta510.zip"),  # 2018, 2019
+        "zip code tabulation area": urljoin(base, f"ZCTA5/tl_{year}_us_zcta510.zip"),
         "block": urljoin(base, f"TABBLOCK/tl_{year}_{fips}_tabblock10.zip"),  # 14-19
         "block group": urljoin(base, f"BG/tl_{year}_{fips}_bg.zip"),
     }

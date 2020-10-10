@@ -5,6 +5,6 @@ class Geography:
     CD = "congressional district"
     COUNTY = "county"
     STATE = "state"
-    ZCTA = "zcta"
+    ZCTA = "zip code tabulation area"
     BLOCK = "block"
     BLOCKGROUP = "block group"
