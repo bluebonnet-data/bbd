@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 from bbd import census, gis, working_directory
@@ -49,6 +50,8 @@ shapefile_dir = census.get_shapefile(
 )
 
 # We only want specific zctas
+# In the future the bbd library should be able to handle this internally
+# Otherwise it might be worth just biting the bullet and using numpy
 with open(here / "tx_harris_county_zctas.txt", "r") as f:
     valid_zctas = [line.rstrip() for line in f.readlines()]
 
@@ -58,7 +61,8 @@ valid_data = {}
 for variable, value_list in data.items():
     valid_data[variable] = [value_list[i] for i in valid_zctas_indexes]
 
-# Print out the race data for the valid zip codes
+# Print out the race data for the valid zip codes in a nicely formatted way
+# that can be copied directly to excel
 with open(here / "data_for_team.csv", "w") as f:
     for header in valid_data.keys():
         f.write(f"{header}\t")
@@ -70,20 +74,36 @@ with open(here / "data_for_team.csv", "w") as f:
 # Make entry with just the proper zcta name to play nicely with the shapefile
 valid_data["ZCTA5CE10"] = valid_data["zip code tabulation area"]
 
-# Percentage of black or african american people out of the total respondants (to color by)
-valid_data["% Black or African American"] = [
-    float(black) / float(tot) * 100 if not tot == "0" else None
-    for tot, black in zip(valid_data["B02001_001E"], valid_data["B02001_003E"])
-]
-variables["% Black or African American"] = "% Black or African American"
+# Determine percentage for all demographics
+percentage_labels = []
+for census_code, description in variables.items():
 
-# Make the map!
-gis.make_map(
-    shapefile_dir,
-    valid_data,
-    join_on="ZCTA5CE10",
-    include=variables,
-    color_by="% Black or African American",
-    save_to=here / "tx-zcta-map.html",
-    trim=True,
-)
+    if not re.match(r"B02001_00[2-9]E", census_code):
+        continue
+
+    label = f"% {description}"
+
+    valid_data[label] = [
+        float(race) / float(tot) * 100 if not tot == "0" else None
+        for tot, race in zip(valid_data["B02001_001E"], valid_data[census_code])
+    ]
+    percentage_labels.append(label)
+
+# Log the percentage label so it shows up nicely in the tooltip
+variables.update({label: label for label in percentage_labels})
+
+# Make all the maps!
+for census_code, description in variables.items():
+
+    if not re.match(r"B02001_00[2-9]E", census_code):
+        continue
+
+    gis.make_map(
+        shapefile_dir,
+        valid_data,
+        join_on="ZCTA5CE10",
+        include=variables,
+        color_by=f"% {description}",
+        save_to=here / f"tx-zcta-map-{census_code}.html",
+        trim=True,  # We definitely don't want all us zip codes on this map
+    )
