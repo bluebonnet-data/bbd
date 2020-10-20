@@ -180,7 +180,11 @@ class TestGeocodeLocation:
 	"""
 	def test1(self):
 		pass
+
+
 	def test2(self):
 		pass
+
+		
 	def test3(self):
 		pass
