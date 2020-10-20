@@ -1,0 +1,8 @@
+shapely
+pyshp
+folium
+branca
+requests
+us
+tqdm
+geopy
