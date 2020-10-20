@@ -37,7 +37,7 @@ class TestGet_geocoder:
 		geocoder = gc.get_geocoder(email)
 
 		address = "Evans Hall, Berkeley, CA"
-		location = gc.geocoder(address)
+		location = geocoder(address)
 
 		error1 = "Geocoder returned None. Either email not accepted "\
 				 "or address not found by OpenStreetMap"
@@ -45,9 +45,9 @@ class TestGet_geocoder:
 		error3 = "Geocder matched with wrong address."
 		assert location is not None, error1
 		assert isinstance(location, geopy.location.Location), error2
-		assert (location.address.contains("Evans Hall") 
-		        & isclose(location.latitude, 38.57656885) 
-		        & isclose(location.longitude, -121.4934010890531)), error3
+		assert (("Evans Hall".lower() in location.address.lower())
+		        & isclose(location.latitude, 37.873621099999994) 
+		        & isclose(location.longitude, -122.25768131042068)), error3
 
 
 	def test_miniumum_runtime(self):
@@ -58,18 +58,16 @@ class TestGet_geocoder:
 		email = "test@bluebonnetdata.org"
 		geocoder = gc.get_geocoder(email)
 
-		n = 3 
+		error_msg = "Geocoder running more than once per second violating "\
+					"Nominatim terms of service."
 
-		t0 = timeit.default_timer()
-		
-		for i in range(n):
-			gc.geocoder("")
-
-		t1 = timeit.default_timer()
-
-		error = "Geocoder running more than once per second violating"\
-				"Nominatim terms of service."
-		assert t1-t0 >= n, error
+		for n in range(5):
+			t0 = timeit.default_timer()
+			for i in range(n):
+				geocoder("")
+			t1 = timeit.default_timer()
+			t_diff = t1-t0
+			assert t_diff >= n-1, error
 		
 
 # ++++++ Test get_reverse_geocoder ++++++
@@ -93,14 +91,41 @@ class TestGet_reverse_geocoder:
 		"""
 		email = "test@bluebonnetdata.org"
 		reverse_geocoder = gc.get_reverse_geocoder(email)
-		pass
+		
+		point = (37.873621099999994, -122.25768131042068) #Evans Hall, Berkeley Ca
+		location = reverse_geocoder(point)
+
+		error1 = "Geocoder returned None. Either email not accepted "\
+				 "or address not found by OpenStreetMap"
+		error2 = "Geocoder did not return geopy.location.Location"
+		error3 = "Geocder matched with wrong address."
+
+		assert location is not None, error1
+		assert isinstance(location, geopy.location.Location), error2
+		assert (("Evans Hall".lower() in location.address.lower())
+		        & ("Berkeley".lower() in location.address.lower())
+		        & isclose(location.latitude, 37.873621099999994) 
+		        & isclose(location.longitude, -122.25768131042068)), error3
 
 	def test_miniumum_runtime(self):
 		"""
 		Tests that the geocoder runs at most 1 address per second in 
 		accordance with Nominatim terms of service.
 		"""
-		pass
+		email = "test@bluebonnetdata.org"
+		reverse_geocoder = gc.get_reverse_geocoder(email)
+
+		error_msg = "Geocoder running more than once per second violating "\
+					"Nominatim terms of service."
+
+		point = (37.873621099999994, -122.25768131042068) #Evans Hall, Berkeley Ca
+		for n in range(5):
+			t0 = timeit.default_timer()
+			for i in range(n):
+				reverse_geocoder(point)
+			t1 = timeit.default_timer()
+			t_diff = t1-t0
+			assert t_diff >= n-1, error
 
 
 # ++++++ Test street_encode +++++++
@@ -168,9 +193,8 @@ class TestStreet_encode:
 			if not gc.street_encode(test) == "101 test ave":
 				errors.append(test)
 
-		error_msg = f"{len(errors)} failed... street_encode failed to trim "\
-					"secondary descriptors from :"\
-					"\n".join(errors)
+		error_msg = f"""{len(errors)} failed... 
+		street_encode failed to trim secondary descriptors from:"""
 		assert not errors, error_msg
 
 

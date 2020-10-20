@@ -3,7 +3,7 @@ from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
 
 from pathlib import Path
-from utils import is_valid_email
+from .utils import is_valid_email
 
 from tqdm import tqdm
 from functools import lru_cache
@@ -88,8 +88,8 @@ def street_encode(address) -> str:
     "420 Test Ave"
     """
     pattern = r"^.*(?= [Aa]p(?:ar)?t(?:ment)? | [Uu]nit | #| [Ll]ot |"\
-              r" [Rr](?:oo)?m | [Bb](?:ui)?ld(?:in)?g | [Uu]ppr| [Ll]o?wr|"\
-              r" [Ss](?:ui)?te | [Ff]l?(?:rnt)? | [Tt]r(?:ai)?le?r | [Dd]ept )"
+              r" [Rr](?:oo)?m | [Bb](?:ui)?ld(?:in)?g | [Uu]pp?e?r| [Ll]o?we?r|"\
+              r" [Ss](?:ui)?te | [Ff](?:l )?(?:rnt)?| [Tt]r(?:ai)?le?r | [Dd]ept )"
     try:
         result = re.search(pattern, address) or address
     except TypeError:
