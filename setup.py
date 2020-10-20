@@ -20,12 +20,14 @@ def get_version(rel_path):
 
 
 requires = [
-    "shapely",
-    "pyshp",
-    "folium",
-    "branca",
     "requests",
     "us",
+    "shapely",
+    "folium",
+    "branca",
+    "pyshp",
+    "geopy",
+    "tqdm",
 ]
 
 long_description = read("README.md")

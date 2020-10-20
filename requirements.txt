@@ -1,8 +1,20 @@
-shapely
-pyshp
-folium
-branca
+# =================================================
+# +++++++++++++++ REQUIRED PACKAGES +++++++++++++++
+# =================================================
+
+## Data & I/O Packages ##
 requests
 us
-tqdm
+
+## Visualization Packages ##
+shapely
+folium
+branca
+
+## GIS Packages ##
+pyshp
 geopy
+
+## Testing & Display ##
+tqdm
+pytest
