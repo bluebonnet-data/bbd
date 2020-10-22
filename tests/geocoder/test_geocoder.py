@@ -9,18 +9,24 @@ import geopy
 import timeit
 from math import isclose
 
+import pandas as pd
+import json
+from pathlib import Path
+
 # --------------------------------------
 #  ##########   UNIT TESTS   ##########
 # --------------------------------------
 
-# ++++++ Test get_geocoder ++++++
+#A valid email to use accross tests
+valid_email = "test@bluebonnetdata.org"
+
+# ###### Test get_geocoder ######
 class TestGet_geocoder:
+	"""Tests for get_geocoder in bbd.geocoder
 	"""
-	Tests for get_geocoder in bbd.geocoder
-	"""
+
 	def test_reject_invalid_email(self):
-		"""
-		Test get_geocoder only accepts valid email
+		"""Test get_geocoder only accepts valid email
 		"""
 		invalid_email = "not an email"
 		with pytest.raises(AssertionError):
@@ -33,7 +39,7 @@ class TestGet_geocoder:
 		accurately geocodes an address.
 		"""
 		#setup
-		email = "test@bluebonnetdata.org"
+		email = valid_email
 		geocoder = gc.get_geocoder(email)
 
 		address = "Evans Hall, Berkeley, CA"
@@ -51,17 +57,16 @@ class TestGet_geocoder:
 
 
 	def test_miniumum_runtime(self):
-		"""
-		Tests that the geocoder runs at most 1 address per second
+		"""Tests that the geocoder runs at most 1 address per second
 		in accordance with Nominatim terms of service.
 		"""
-		email = "test@bluebonnetdata.org"
+		email = valid_email
 		geocoder = gc.get_geocoder(email)
 
 		error_msg = "Geocoder running more than once per second violating "\
 					"Nominatim terms of service."
 
-		for n in range(5):
+		for n in range(1,4):
 			t0 = timeit.default_timer()
 			for i in range(n):
 				geocoder("")
@@ -70,26 +75,22 @@ class TestGet_geocoder:
 			assert t_diff >= n-1, error
 		
 
-# ++++++ Test get_reverse_geocoder ++++++
+# ###### Test get_reverse_geocoder ######
 class TestGet_reverse_geocoder:
-	"""
-	Tests for get_reverse_geocoder in bbd.geocoder
-	"""
+	"""Tests for get_reverse_geocoder in bbd.geocoder"""
+
 	def test_reject_invalid_email(self):
-		"""
-		Test get_reverse_geocoder only accepts valid email
-		"""
+		"""Test get_reverse_geocoder only accepts valid email"""
 		invalid_email = "not an email"
 		with pytest.raises(AssertionError):
 			gc.get_reverse_geocoder(invalid_email)
 
 
 	def test_reverse_geocoder(self):
-		"""
-		Test that the reverse geocoder returned by get_reverse_geocoder
+		"""Test that the reverse geocoder returned by get_reverse_geocoder
 		accurately reverse geocodes an address.
 		"""
-		email = "test@bluebonnetdata.org"
+		email = valid_email
 		reverse_geocoder = gc.get_reverse_geocoder(email)
 		
 		point = (37.873621099999994, -122.25768131042068) #Evans Hall, Berkeley Ca
@@ -107,19 +108,19 @@ class TestGet_reverse_geocoder:
 		        & isclose(location.latitude, 37.873621099999994) 
 		        & isclose(location.longitude, -122.25768131042068)), error3
 
+
 	def test_miniumum_runtime(self):
-		"""
-		Tests that the geocoder runs at most 1 address per second in 
+		"""Tests that the geocoder runs at most 1 address per second in 
 		accordance with Nominatim terms of service.
 		"""
-		email = "test@bluebonnetdata.org"
+		email = valid_email
 		reverse_geocoder = gc.get_reverse_geocoder(email)
 
 		error_msg = "Geocoder running more than once per second violating "\
 					"Nominatim terms of service."
 
 		point = (37.873621099999994, -122.25768131042068) #Evans Hall, Berkeley Ca
-		for n in range(5):
+		for n in range(1, 4):
 			t0 = timeit.default_timer()
 			for i in range(n):
 				reverse_geocoder(point)
@@ -128,26 +129,25 @@ class TestGet_reverse_geocoder:
 			assert t_diff >= n-1, error
 
 
-# ++++++ Test street_encode +++++++
+# ###### Test street_encode ######
 class TestStreet_encode:
-	"""
-	Tests for street_encode in bbd.geocoder
+	"""Tests for street_encode in bbd.geocoder
 	"""
 	def test_unedited_inputs(self):
 		"""
 		Tests that street_encode will return its input when no regex
 		match is found.
 		"""
-		test = "101 Test Ave"
+		tests = ["101 Test Ave", ""]
 
 		error = "street_encode not returning input when there are"\
 				" no regex matches."
-		assert gc.street_encode(test) is test, error
+		for test in tests:
+			assert gc.street_encode(test) is test, error
 
 
 	def test_None_input(self):
-		"""
-		Tests that street_encode returns an empty string when input 
+		"""Tests that street_encode returns an empty string when input 
 		is None.
 		"""
 		test = None
@@ -157,8 +157,7 @@ class TestStreet_encode:
 
 
 	def test_edited_inputs(self):
-		"""
-		Tests that secondary descriptors are being properly trimmed.
+		"""Tests that secondary descriptors are being properly trimmed.
 		"""
 		errors = []
 		tests = [
@@ -198,12 +197,35 @@ class TestStreet_encode:
 		assert not errors, error_msg
 
 
-# ++++++ Test GeoLocation Methods ++++++
+# ###### Test GeoLocation Methods ######
 class TestGeocodeLocation:
-	"""
-	"""
-	def test1(self):
-		pass
+	"""Tests for methods in bbd.geocoder.GeocodeLocations """
+
+	#Setting up cross-test enviornment
+	data_df_path = Path("test_data/data.json")
+	data_list_path = Path("test_data/data.txt")
+
+	#Making address_df for testing pd.DataFrame implementation
+	#address_df has Address, City, State, Zip5 columns
+	address_df = pd.read_json(data_df_path)
+
+	#Making address_list for testing list of str implementation 
+	with open(data_list_path,"r") as f:
+		address_list = f.read().splitlines()
+
+	#Making address_dict for testing list of dict implementation
+	with open(data_df_path, "r") as f:
+		address_dict = json.load(f)
+
+
+	def test_GeocodeLocation_make_file_header(self, tmp_path):
+		"""Tests the ._make_file() and ._make_header() methods
+		for GeocodeLocations
+		"""
+		d = tmp_path.mkdir("test")
+		p = d/"test.txt"
+		
+		gl = gc.GeocodeLocations(address_df, valid_email, p)
 
 
 	def test2(self):
