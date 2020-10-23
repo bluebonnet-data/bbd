@@ -253,6 +253,133 @@ class TestGeocodeLocations:
 		assert len(test) == 234, "Not all lines were saved to disk"
 		assert len(gl.locations) == 234, "Not all lines were saved in object"
 
-		
-	def test3(self):
-		pass
+
+	def test_GeocodeLocations_run_mult_batches(self, tmp_path):
+		"""Tests the .run() and associated methods for GeocodeLocations when
+		multiple batches are needed.
+		"""
+		p = tmp_path/"test.csv"
+
+		gl = gc.GeocodeLocations(self.address_df, valid_email, p,
+		                         batch_size = 100)
+		gl._set_test_geocoder()
+
+		gl.run()
+
+		test = pd.read_csv(p)
+
+		assert gl.tot_batches == 3, "Batches are not constructed properly."
+
+		assert not test.empty, "No results saved to disk."
+		assert not gl.locations.empty, "No results stored in object."
+
+		assert len(test) == 234, "Not all lines were saved to disk."
+		assert len(gl.locations) == 234, "Not all lines were saved in object."
+
+
+	def test_GeocodeLocations_run_less_than_all_batches(self, tmp_path):
+		"""Tests the .run() and associated methods for GeocodeLocations when
+		running less than all batches. 
+		"""
+		p = tmp_path/"test.csv"
+
+		gl = gc.GeocodeLocations(self.address_df, valid_email, p,
+		                         batch_size = 100)
+		gl._set_test_geocoder()
+
+		gl.run(num_batches = 1)
+
+		test = pd.read_csv(p)
+
+		assert gl.tot_batches == 3, "Batches are not constructed properly."
+		assert gl.curr_batch < 3, "Run running too many batches."
+
+		assert not test.empty, "No results saved to disk."
+		assert not gl.locations.empty, "No results stored in object."
+
+		assert len(test) < 234, "Not all lines were saved to disk."
+		assert len(gl.locations) < 234, "Not all lines were saved in object."
+
+
+	def test_GeocodeLocations_process_address_string(self, tmp_path):
+		"""Tests the .run() and associated methods for GeocodeLocations when
+		running on a list of address strings.
+		"""
+		p = tmp_path/"test.csv"
+
+		gl = gc.GeocodeLocations(self.address_list, valid_email, p,
+		                         batch_size = 100)
+		gl._set_test_geocoder()
+
+		gl.run()
+
+		test = pd.read_csv(p)
+
+		assert gl.tot_batches == 3, "Batches are not constructed properly."
+
+		assert not test.empty, "No results saved to disk."
+		assert not gl.locations.empty, "No results stored in object."
+
+		assert len(test) == 234, "Not all lines were saved to disk."
+		assert len(gl.locations) == 234, "Not all lines were saved in object."
+
+
+	def test_GeocodeLocations_address_dict(self, tmp_path):
+		"""Tests the .run() and associated methods when constructing df from
+		list of dicts.
+		"""
+		p = tmp_path/"test.csv"
+
+		gl = gc.GeocodeLocations(self.address_dict, valid_email, p,
+		                         batch_size = 100)
+		gl._set_test_geocoder()
+
+		gl.run()
+
+		test = pd.read_csv(p)
+
+		assert gl.tot_batches == 3, "Batches are not constructed properly."
+
+		assert not test.empty, "No results saved to disk."
+		assert not gl.locations.empty, "No results stored in object."
+
+		assert len(test) == 234, "Not all lines were saved to disk."
+		assert len(gl.locations) == 234, "Not all lines were saved in object."
+
+
+	def test_GeocodeLocations_test_real_geocoder(self, tmp_path):
+		"""Tests the .run() and associated methods with a real geocoder
+		"""
+		p = tmp_path/"test.csv"
+
+		gl = gc.GeocodeLocations(self.address_df, valid_email, p,
+		                         batch_size = 1)
+		gl.run(num_batches=3)
+
+		assert all(gl.locations.all())
+
+
+	def test_GeocodeLocations_reset(self, tmp_path):
+		"""
+		"""
+		#Mocks the input asking for DELETE
+		gc.input = lambda *args : "DELETE"
+
+		p = tmp_path/"test.csv"
+
+		gl = gc.GeocodeLocations(self.address_df, valid_email, p)
+		gl._set_test_geocoder()
+
+		gl.run()
+
+		gl.reset()
+
+		test = pd.read_csv(p)
+
+		assert test.empty, "File was not deleted"
+		assert gl.curr_batch == 1, "Batches were not reset"
+		assert len(gl._queue) == 234, "Queue was not reset"
+
+
+	def teardown_method(self):
+		gc.input = input

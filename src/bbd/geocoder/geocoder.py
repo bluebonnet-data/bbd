@@ -229,7 +229,7 @@ class GeocodeLocations:
 
         self.data = pd.DataFrame(data)
 
-        if data.empty:
+        if self.data.empty:
             raise ValueError("Data cannot be empty!")
 
         if not keep_index:
@@ -242,7 +242,7 @@ class GeocodeLocations:
                               'state', 'country', 'zip5', 'zip', 
                               'postal', 'postalcode']
 
-            self.included_cols = [col for col in data.columns
+            self.included_cols = [col for col in self.data.columns
                                   if col.lower() in component_list]
 
             if not self.included_cols:
@@ -255,6 +255,8 @@ class GeocodeLocations:
             if not all([key.lower() in component_list for key in defaults]):
                 raise ValueError("All keys in defaults must be components"\
                                  "of an address.")
+        else:
+            self.included_cols = [self.data.columns[0]]
 
         self.batch_size = batch_size
 
@@ -341,7 +343,7 @@ class GeocodeLocations:
             col = self.included_cols[0]
         except NameError:
             col = self.data.columns[0]
-        address = data.loc[i, col]
+        address = self.data.loc[i, col]
         
         result = self._run_geocoder(address)
         try:
@@ -437,7 +439,7 @@ class GeocodeLocations:
             num_batches = len(self._queue)//self.batch_size + 1
 
         if num_batches <= 0 or len(self._queue) == 0:
-            print("All done!")
+            print("All done!", flush = True)
             return self.locations
 
         batch = [] #need to decide how to pull batches from queue
@@ -451,7 +453,7 @@ class GeocodeLocations:
               flush = True)
         self._run_batch(batch)
 
-        print("Batch complete!")
+        print("Batch complete!", flush = True)
         self.curr_batch += 1 #Update batch count
         
         return self.run(num_batches-1)
