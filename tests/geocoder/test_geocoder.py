@@ -59,6 +59,9 @@ class TestGet_geocoder:
 	def test_miniumum_runtime(self):
 		"""Tests that the geocoder runs at most 1 address per second
 		in accordance with Nominatim terms of service.
+
+		Because this test needs to verify the RateLimiter is working 
+		consistently, it runs unusually long... sorry.
 		"""
 		email = valid_email
 		geocoder = gc.get_geocoder(email)
@@ -66,7 +69,7 @@ class TestGet_geocoder:
 		error_msg = "Geocoder running more than once per second violating "\
 					"Nominatim terms of service."
 
-		for n in range(1,4):
+		for n in range(3):
 			t0 = timeit.default_timer()
 			for i in range(n):
 				geocoder("")
@@ -112,6 +115,9 @@ class TestGet_reverse_geocoder:
 	def test_miniumum_runtime(self):
 		"""Tests that the geocoder runs at most 1 address per second in 
 		accordance with Nominatim terms of service.
+
+		Because this test needs to verify the RateLimiter is working 
+		consistently, it runs unusually long... sorry.
 		"""
 		email = valid_email
 		reverse_geocoder = gc.get_reverse_geocoder(email)
@@ -120,7 +126,7 @@ class TestGet_reverse_geocoder:
 					"Nominatim terms of service."
 
 		point = (37.873621099999994, -122.25768131042068) #Evans Hall, Berkeley Ca
-		for n in range(1, 4):
+		for n in range(3):
 			t0 = timeit.default_timer()
 			for i in range(n):
 				reverse_geocoder(point)
