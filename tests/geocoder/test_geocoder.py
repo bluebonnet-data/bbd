@@ -197,8 +197,8 @@ class TestStreet_encode:
 		assert not errors, error_msg
 
 
-# ###### Test GeoLocation Methods ######
-class TestGeocodeLocation:
+# ###### Test GeoLocations Methods ######
+class TestGeocodeLocations:
 	"""Tests for methods in bbd.geocoder.GeocodeLocations """
 
 	#Setting up cross-test enviornment
@@ -218,18 +218,40 @@ class TestGeocodeLocation:
 		address_dict = json.load(f)
 
 
-	def test_GeocodeLocation_make_file_header(self, tmp_path):
+	def test_GeocodeLocatios_make_file_header(self, tmp_path):
 		"""Tests the ._make_file() and ._make_header() methods
 		for GeocodeLocations
 		"""
-		d = tmp_path.mkdir("test")
-		p = d/"test.txt"
-		
-		gl = gc.GeocodeLocations(address_df, valid_email, p)
+		p = tmp_path/"test.csv"
+
+		gl = gc.GeocodeLocations(self.address_df, valid_email, p)
+
+		test_df = pd.read_csv(p)
+
+		error_msg = "Saved File has improper header."
+		assert "latitude" in test_df.columns, error_msg
+		assert "longitude" in test_df.columns, error_msg
+		assert "address" in test_df.columns, error_msg
 
 
-	def test2(self):
-		pass
+	def test_GeocodeLocations_run_one_batch(self, tmp_path):
+		"""Tests the .run() and associated methods for
+		GeocodeLocations.
+		"""
+		p = tmp_path/"test.csv"
+
+		gl = gc.GeocodeLocations(self.address_df, valid_email, p)
+		gl._set_test_geocoder()
+
+		gl.run()
+
+		test = pd.read_csv(p)
+
+		assert not test.empty, "No results saved to disk."
+		assert not gl.locations.empty, "No results stored in object."
+
+		assert len(test) == 234, "Not all lines were saved to disk"
+		assert len(gl.locations) == 234, "Not all lines were saved in object"
 
 		
 	def test3(self):
