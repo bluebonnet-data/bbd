@@ -13,6 +13,8 @@ import re
 
 import pandas as pd
 
+from collections import deque
+
 def get_geocoder(email):
     """Get geocode function for geocoding through Nominatim with supplied
     email address as the user_agent, as per Nominatim's usage policy.
@@ -305,7 +307,7 @@ class GeocodeLocations:
     def _fill_queue(self):
         """Fill Queue as copy from data's index."""
         #Set queue
-        self._queue = list(self.data.index)
+        self._queue = deque(self.data.index)
 
         #Set batch info: Only used for display purposes
         self.tot_batches = len(self._queue)//self.batch_size + 1
@@ -315,8 +317,8 @@ class GeocodeLocations:
     def _load_queue(self):
         """Set Queue to only remaining addresses."""
         #Set queue
-        self._queue = [i for i in self.data.index if i 
-                       not in self.locations.index]
+        self._queue = deque([i for i in self.data.index if i 
+                             not in self.locations.index])
 
         
         #Set batch info: Only used for display purposes
@@ -457,7 +459,7 @@ class GeocodeLocations:
         batch = [] #need to decide how to pull batches from queue
         for i in range(self.batch_size):
             try:
-                batch.append(self._queue.pop(0))
+                batch.append(self._queue.popleft())
             except IndexError:
                 pass #reached end of Queue
 
