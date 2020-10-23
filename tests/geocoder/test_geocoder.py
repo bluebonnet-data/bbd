@@ -214,7 +214,7 @@ class TestGeocodeLocations:
 
 	#Making address_df for testing pd.DataFrame implementation
 	#address_df has Address, City, State, Zip5 columns
-	address_df = pd.read_json(data_df_path, lines = True)
+	address_df = pd.read_json(data_df_path, lines = True, orient = 'records')
 
 	#Making address_list for testing list of str implementation 
 	with open(data_list_path,"r") as f:
