@@ -5,6 +5,7 @@
 ## Data & I/O Packages ##
 requests
 us
+numpy
 pandas
 
 ## Visualization Packages ##

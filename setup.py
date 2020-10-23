@@ -22,6 +22,7 @@ def get_version(rel_path):
 requires = [
     "requests",
     "us",
+    "numpy",
     "pandas",
     "shapely",
     "folium",
