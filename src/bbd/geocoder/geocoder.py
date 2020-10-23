@@ -261,7 +261,7 @@ class GeocodeLocations:
         self.batch_size = batch_size
 
         #Check file status then load or create file.
-        self.path = Path(path)
+        self.path = Path(path).resolve()
         try:
             #Load already geocoded results.
             self.locations = pd.read_csv(self.path)
