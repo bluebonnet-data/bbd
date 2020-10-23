@@ -437,6 +437,8 @@ class GeocodeLocations:
         """
         if num_batches is None:
             num_batches = len(self._queue)//self.batch_size + 1
+            print("Beginning Geocoding: This may take many hours. "\
+                  "Progress saved as it goes.")
 
         if num_batches <= 0 or len(self._queue) == 0:
             print("All done!", flush = True)
@@ -551,3 +553,4 @@ class GeocodeLocations:
                     yield evans_hall
         gen = test_generator()
         self._geocoder = lambda *args, **kwargs: next(gen)
+
