@@ -108,10 +108,20 @@ def street_encode(street) -> str:
         result = re.search(pattern, street) or street
     except TypeError:
         result = ""
-    if type(result) is re.Match:
-        #want only first result.
-        return result[0]
-    return result
+    if type(result) == str:
+        return result #No match
+    else:
+        return result[0] #Match
+    #try: #Python >=3.7
+    #    if type(result) is re.Match:
+    #        #want only first result.
+    #        return result[0]
+    #    return result
+    #except AttributeError: #Python<3.7
+    #    if type(result) == str:
+    #        return result
+    #    else:
+    #        return result[0]
 
 
 class GeocodeLocations:
