@@ -204,7 +204,9 @@ class TestGeocodeLocations:
 
 	#Setting up cross-test enviornment
 	data_df_path = Path("test_data/data.json").resolve()
+	assert data_df_path.exists()
 	data_list_path = Path("test_data/data.txt").resolve()
+	assert data_list_path.exists()
 
 	#Making address_df for testing pd.DataFrame implementation
 	#address_df has Address, City, State, Zip5 columns
