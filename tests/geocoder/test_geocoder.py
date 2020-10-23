@@ -10,6 +10,7 @@ import timeit
 from math import isclose
 
 import pandas as pd
+import numpy as np
 import json
 from pathlib import Path
 
@@ -384,4 +385,3 @@ class TestGeocodeLocations:
 	def teardown_method(self):
 		gc.input = input
 
-		
