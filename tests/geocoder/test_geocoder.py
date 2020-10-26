@@ -192,7 +192,9 @@ class TestStreet_encode:
 			"101 test ave Trailer 16",
 			"101 test ave trlr 17",
 			"101 test ave Dept 18",
-			"101 test ave dept 19"
+			"101 test ave dept 19",
+			"101 test ave     rm 10",
+			"101 test ave"
 		]
 		for test in tests:
 			if not gc.street_encode(test) == "101 test ave":
@@ -238,12 +240,13 @@ class TestGeocodeLocations:
 
 		gl = gc.GeocodeLocations(self.address_df, valid_email, p)
 
-		test_df = pd.read_csv(p)
+		test = pd.read_csv(p, sep = "\t")
 
 		error_msg = "Saved File has improper header."
-		assert "latitude" in test_df.columns, error_msg
-		assert "longitude" in test_df.columns, error_msg
-		assert "address" in test_df.columns, error_msg
+		assert "latitude" in test.columns, error_msg
+		assert "longitude" in test.columns, error_msg
+		assert "address" in test.columns, error_msg
+		assert len(test.columns) <= 4, error_msg
 
 
 	def test_GeocodeLocations_run_one_batch(self, tmp_path):
@@ -257,13 +260,15 @@ class TestGeocodeLocations:
 
 		gl.run()
 
-		test = pd.read_csv(p)
+		test = pd.read_csv(p, sep = "\t")
 
 		assert not test.empty, "No results saved to disk."
 		assert not gl.locations.empty, "No results stored in object."
 
 		assert len(test) == 234, "Not all lines were saved to disk"
 		assert len(gl.locations) == 234, "Not all lines were saved in object"
+
+		assert len(test.columns) <= 4, "Saved too many columns in tsv format"
 
 
 	def test_GeocodeLocations_run_mult_batches(self, tmp_path):
@@ -278,7 +283,7 @@ class TestGeocodeLocations:
 
 		gl.run()
 
-		test = pd.read_csv(p)
+		test = pd.read_csv(p, sep = "\t")
 
 		assert gl.tot_batches == 3, "Batches are not constructed properly."
 
@@ -325,7 +330,7 @@ class TestGeocodeLocations:
 
 		gl.run()
 
-		test = pd.read_csv(p)
+		test = pd.read_csv(p, sep = "\t")
 
 		assert gl.tot_batches == 3, "Batches are not constructed properly."
 
@@ -348,7 +353,7 @@ class TestGeocodeLocations:
 
 		gl.run()
 
-		test = pd.read_csv(p)
+		test = pd.read_csv(p, sep = "\t")
 
 		assert gl.tot_batches == 3, "Batches are not constructed properly."
 
@@ -386,7 +391,7 @@ class TestGeocodeLocations:
 
 		gl.reset()
 
-		test = pd.read_csv(p)
+		test = pd.read_csv(p, sep = "\t")
 
 		assert test.empty, "File was not deleted"
 		assert gl.curr_batch == 1, "Batches were not reset"
@@ -395,5 +400,4 @@ class TestGeocodeLocations:
 
 	def teardown_method(self):
 		gc.input = input
-		gc.email = valid_email #undoes ._set_test_geocoder()
 

@@ -5,7 +5,7 @@ from geopy.extra.rate_limiter import RateLimiter
 from pathlib import Path
 from .utils import is_valid_email
 
-from tqdm import tqdm
+from tqdm.auto import tqdm
 from functools import lru_cache
 
 from inspect import signature
@@ -103,9 +103,9 @@ def street_encode(street) -> str:
     >>> street_encode("420 Test Ave Unit 5")
     "420 Test Ave"
     """
-    pattern = r"^.*(?= [Aa]p(?:ar)?t(?:ment)? | [Uu]nit | #| [Ll]ot |"\
-              r" [Rr](?:oo)?m | [Bb](?:ui)?ld(?:in)?g | [Uu]pp?e?r| [Ll]o?we?r|"\
-              r" [Ss](?:ui)?te | [Ff](?:l )?(?:rnt)?| [Tt]r(?:ai)?le?r | [Dd]ept )"
+    pattern = r"^.*\S(?=(?:\s+)(?:[Aa]p(?:ar)?t(?:ment)? |[Uu]nit |#|[Ll]ot |"\
+              r"[Rr](?:oo)?m |[Bb](?:ui)?ld(?:in)?g |[Uu]pp?e?r|[Ll]o?we?r|"\
+              r"[Ss](?:ui)?te |[Ff](?:l )?(?:rnt)?|[Tt]r(?:ai)?le?r |[Dd]ept ))"
     try:
         result = re.search(pattern, street) or street
     except TypeError:
@@ -128,9 +128,9 @@ def street_encode(street) -> str:
 
 class GeocodeLocations:
     """ Friendly wrapper to geocode large batches of data with Nominatim
-    and saves to file located at path. This will remember your progress
-    across session and also allows user to only run a number of batches 
-    of size batch_size.
+    and saves to file in tab deliminated format located at path. This 
+    will remember your progress across session and also allows user to 
+    only run a number of batches of size batch_size.
 
     Please note, this process MAY NOT be multi-threaded or run in parallel.
     Please read Nominatim's Usage Policy here: 
@@ -230,7 +230,7 @@ class GeocodeLocations:
     _cache_size = 4000
     def __init__(self, data, email, path, batch_size = 3600,
                  defaults = {"Country":"United States"}, 
-                 keep_index = True):
+                 keep_index = True, index_name = ""):
         """Constructor for bbd.geocoder.GeocodeLocations"""
 
         #Creates geocoder with email passed as user_agent
@@ -246,6 +246,11 @@ class GeocodeLocations:
 
         if not keep_index:
             self.data = self.data.reset_index(drop=True)
+
+        try:
+            self.index_name = index_name or self.data.index.name
+        except AttributeError:
+            self.index_name = ""
 
         #Verifying address components.
         if len(self.data.columns) > 1:
@@ -276,7 +281,8 @@ class GeocodeLocations:
         self.path = Path(path).resolve()
         try:
             #Load already geocoded results.
-            self.locations = pd.read_csv(self.path)
+            self.locations = pd.read_csv(self.path, sep = '\t',
+                                         index_col = self.index_name or 0)
             
             #check that self.locations is appropriate file.
             if not all([col in self.locations.columns for col 
@@ -295,11 +301,11 @@ class GeocodeLocations:
 
         #Set default street encoder
         self._street_encode = street_encode
- 
+
 
     def _make_file(self, path):
         """Make new file at self.path and put in the header."""
-        header = ",latitude,longitude,address\n"
+        header = f"{self.index_name}\tlatitude\tlongitude\taddress\n"
         with open(path, "w") as f:
             f.write(header)
 
@@ -441,7 +447,7 @@ class GeocodeLocations:
                                        'address']] = lat, lon, address
 
                 #Save processed address to path.
-                f.write(f"{i}, {lat}, {lon}, {address}\n")
+                f.write(f"{i}\t{lat or ''}\t{lon or ''}\t{address}\n")
 
 
     def run(self, num_batches=None):
@@ -481,8 +487,8 @@ class GeocodeLocations:
         """
         if self.path.exists():
             warn_msg = f"""WARNING:
-            This will overwrite file at {self.path}...
-            Type 'DELETE' to continute.
+    This will overwrite file at {self.path}...
+    Type 'DELETE' to continute.
             """
             confirmation = input(warn_msg)
 
@@ -526,21 +532,29 @@ class GeocodeLocations:
 
 
     @geocoder.setter
-    def geocoder(self, email):
-        """Setter for geocoder. Will keep asking for valid email until one
-        is entered.
+    def geocoder(self, new):
+        """Setter for geocoder. Geocoder can be a geopy geocoder instance,
+        a geopy RateLimiter or a str email.
         """
-        try:
-            self._geocoder = get_geocoder(email)
-        except AssertionError:
-            #Will keep asking for new email until valid one input.
-            print("Error: Must be a valid email...")
-            new_email = input("Please enter a valid email: ")
-            self.geocoder = new_email #recursion
+        if type(new) == str:
+            try:
+                self._geocoder = get_geocoder(new)
+            except AssertionError:
+                #Will keep asking for new email until valid one input.
+                print("Error: Must be a valid email...")
+                new_email = input("Please enter a valid email: ")
+                self.geocoder = new_email #recursion
+
+        elif type(new) == geopy.extra.rate_limiter.RateLimiter:
+            self._geocoder = new
+
+        else:
+            errormsg = "geocoder must be str email to change Nominatim "\
+            "user_agent, or a geopy geocoder wrapped in geopy RateLimiter."
+            raise ValueError(errormsg)
 
 
-    #email is alias for setting new geocoder
-    email = geocoder
+    email = geocoder # Email is Alias for geocoder.
 
 
     def _set_test_geocoder(self):
