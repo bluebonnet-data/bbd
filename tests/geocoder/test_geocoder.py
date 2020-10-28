@@ -240,13 +240,14 @@ class TestGeocodeLocations:
     """Tests for methods in bbd.geocoder.GeocodeLocations """
 
     # Setting up cross-test enviornment
-    # data_df_path = Path("test_data/data.json").resolve()
     data_df_path = Path(__file__).parent / "test_data/data.json"
     data_df_path = data_df_path.resolve()
+
     assert data_df_path.exists()
-    # data_list_path = Path("test_data/data.txt").resolve()
+
     data_list_path = Path(__file__).parent / "test_data/data.txt"
     data_list_path = data_list_path.resolve()
+    
     assert data_list_path.exists()
 
     # Making address_df for testing pd.DataFrame implementation
