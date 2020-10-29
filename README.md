@@ -23,9 +23,9 @@ Follow along with this walkthrough to learn more detailed infomation about using
 
 | Module                         |
 | ------                         |
-| [Census](###-Census-Module)     |
-| [GIS](###-GIS-Module)           |
-| [Geocoder](###-Geocoder-Module) |
+| [Census](#census-module)     |
+| [GIS](#gis-module)           |
+| [Geocoder](#geocoder-module) |
 
 
 ### Census Module
