@@ -23,9 +23,9 @@ Follow along with this walkthrough to learn more detailed infomation about using
 
 | Module                         |
 | ------                         |
-| [Census](###Census-Module)     |
-| [GIS](###GIS-Module)           |
-| [Geocoder](###Geocoder-Module) |
+| [Census](###-Census-Module)     |
+| [GIS](###-GIS-Module)           |
+| [Geocoder](###-Geocoder-Module) |
 
 
 ### Census Module
@@ -180,8 +180,8 @@ Simply open `path/to/save/map.html` in your favorite browser to view your map!
 
 The geocoder module allows us to use OpenStreetMap's Nominatim api to geocode large batches of addresses slowly but for free! 
 
-```
-- Warning! Per Nominatim's Terms of Usage, this process may not be run in parallel.
+```- 
+Warning! Per Nominatim's Terms of Usage, this process may not be run in parallel.
 ```
 
 If we have Addresses from VAN or another source that we want to map, we can use the geocoder submodule to get the Latitude, Longitude pair for each address.
@@ -216,6 +216,7 @@ The Components of an address are:
 | State             |                   |
 | Postalcode        | Zip, Zip5, Postal |
 | Country\*         |                   |
+
 \*Country is set to United States by default.
 
 
