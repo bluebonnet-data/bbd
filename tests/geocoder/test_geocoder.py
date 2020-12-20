@@ -206,7 +206,7 @@ class TestEncode_street_address:
 
 
 def add_set_dummy_geocoder_method():
-    gc.GeocodeLocations.__real_geocoder = gc.get_geocoder(valid_email)
+    gc.LocationsGeocoder.__real_geocoder = gc.get_geocoder(valid_email)
 
     def _set_dummy_geocoder(self):
         """Method for testing. Will change _geocoder to function that 
@@ -231,13 +231,13 @@ def add_set_dummy_geocoder_method():
         gen = test_generator()
         self._geocoder = lambda *args, **kwargs: next(gen)
 
-    gc.GeocodeLocations._set_dummy_geocoder = _set_dummy_geocoder
+    gc.LocationsGeocoder._set_dummy_geocoder = _set_dummy_geocoder
 
 
 
 # ###### Test GeoLocations Methods ######
-class TestGeocodeLocations:
-    """Tests for methods in bbd.geocoder.GeocodeLocations """
+class TestLocationsGeocoder:
+    """Tests for methods in bbd.geocoder.LocationsGeocoder """
 
     # Setting up cross-test enviornment
     data_df_path = Path(__file__).parent / "test_data/data.json"
@@ -266,13 +266,13 @@ class TestGeocodeLocations:
     # Method for setting dummy _geocoder
     add_set_dummy_geocoder_method()
 
-    def test_GeocodeLocatios_make_file_header(self, tmp_path):
+    def test_LocationsGeocoder_make_file_header(self, tmp_path):
         """Tests the ._make_file() and ._make_header() methods
-        for GeocodeLocations
+        for LocationsGeocoder
         """
         p = tmp_path/"test.csv"
 
-        gl = gc.GeocodeLocations(self.address_df, valid_email, p)
+        gl = gc.LocationsGeocoder(self.address_df, valid_email, p)
 
         test = pd.read_csv(p, sep = "\t")
 
@@ -283,13 +283,13 @@ class TestGeocodeLocations:
         assert len(test.columns) <= 4, error_msg
 
 
-    def test_GeocodeLocations_run_one_batch(self, tmp_path):
+    def test_LocationsGeocoder_run_one_batch(self, tmp_path):
         """Tests the .run() and associated methods for
-        GeocodeLocations.
+        LocationsGeocoder.
         """
         p = tmp_path/"test.csv"
 
-        gl = gc.GeocodeLocations(self.address_df, valid_email, p)
+        gl = gc.LocationsGeocoder(self.address_df, valid_email, p)
         gl._set_dummy_geocoder()
 
         gl.run()
@@ -305,13 +305,13 @@ class TestGeocodeLocations:
         assert len(test.columns) <= 4, "Saved too many columns in tsv format"
 
 
-    def test_GeocodeLocations_run_mult_batches(self, tmp_path):
-        """Tests the .run() and associated methods for GeocodeLocations when
+    def test_LocationsGeocoder_run_mult_batches(self, tmp_path):
+        """Tests the .run() and associated methods for LocationsGeocoder when
         multiple batches are needed.
         """
         p = tmp_path/"test.csv"
 
-        gl = gc.GeocodeLocations(self.address_df, valid_email, p,
+        gl = gc.LocationsGeocoder(self.address_df, valid_email, p,
                                  batch_size = 100)
         gl._set_dummy_geocoder()
 
@@ -328,13 +328,13 @@ class TestGeocodeLocations:
         assert len(gl.locations) == 234, "Not all lines were saved in object."
 
 
-    def test_GeocodeLocations_run_less_than_all_batches(self, tmp_path):
-        """Tests the .run() and associated methods for GeocodeLocations when
+    def test_LocationsGeocoder_run_less_than_all_batches(self, tmp_path):
+        """Tests the .run() and associated methods for LocationsGeocoder when
         running less than all batches. 
         """
         p = tmp_path/"test.csv"
 
-        gl = gc.GeocodeLocations(self.address_df, valid_email, p,
+        gl = gc.LocationsGeocoder(self.address_df, valid_email, p,
                                  batch_size = 100)
         gl._set_dummy_geocoder()
 
@@ -352,13 +352,13 @@ class TestGeocodeLocations:
         assert len(gl.locations) < 234, "Not all lines were saved in object."
 
 
-    def test_GeocodeLocations_process_address_string(self, tmp_path):
-        """Tests the .run() and associated methods for GeocodeLocations when
+    def test_LocationsGeocoder_process_address_string(self, tmp_path):
+        """Tests the .run() and associated methods for LocationsGeocoder when
         running on a list of address strings.
         """
         p = tmp_path/"test.csv"
 
-        gl = gc.GeocodeLocations(self.address_list, valid_email, p,
+        gl = gc.LocationsGeocoder(self.address_list, valid_email, p,
                                  batch_size = 100)
         gl._set_dummy_geocoder()
 
@@ -375,13 +375,13 @@ class TestGeocodeLocations:
         assert len(gl.locations) == 234, "Not all lines were saved in object."
 
 
-    def test_GeocodeLocations_address_dict(self, tmp_path):
+    def test_LocationsGeocoder_address_dict(self, tmp_path):
         """Tests the .run() and associated methods when constructing df from
         list of dicts.
         """
         p = tmp_path/"test.csv"
 
-        gl = gc.GeocodeLocations(self.address_dict, valid_email, p,
+        gl = gc.LocationsGeocoder(self.address_dict, valid_email, p,
                                  batch_size = 100)
         gl._set_dummy_geocoder()
 
@@ -398,19 +398,19 @@ class TestGeocodeLocations:
         assert len(gl.locations) == 234, "Not all lines were saved in object."
 
 
-    def test_GeocodeLocations_test_real_geocoder(self, tmp_path):
+    def test_LocationsGeocoder_test_real_geocoder(self, tmp_path):
         """Tests the .run() and associated methods with a real geocoder
         """
         p = tmp_path/"test.csv"
 
-        gl = gc.GeocodeLocations(self.address_df, valid_email, p,
+        gl = gc.LocationsGeocoder(self.address_df, valid_email, p,
                                  batch_size = 1)
         gl.run(num_batches=3)
 
         assert all(gl.locations.all())
 
 
-    def test_GeocodeLocations_reset(self, tmp_path):
+    def test_LocationsGeocoder_reset(self, tmp_path):
         """
         """
         #Mocks the input asking for DELETE
@@ -418,7 +418,7 @@ class TestGeocodeLocations:
 
         p = tmp_path/"test.csv"
 
-        gl = gc.GeocodeLocations(self.address_df, valid_email, p)
+        gl = gc.LocationsGeocoder(self.address_df, valid_email, p)
         gl._set_dummy_geocoder()
 
         gl.run()

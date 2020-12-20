@@ -186,7 +186,7 @@ Warning! Per Nominatim's Terms of Usage, this process may not be run in parallel
 
 If we have Addresses from VAN or another source that we want to map, we can use the geocoder submodule to get the Latitude, Longitude pair for each address.
 
-Data exported to VAN will usually be in a tab-separated value text file containing columns with address components. As such, `geocoder.GeocodeLocations` can take in a DataFrame or list of dict's with address components. Also, `geocoder.GeocodeLocations` will accept lists of string addresses, but it will perform less effectively than using address components. 
+Data exported to VAN will usually be in a tab-separated value text file containing columns with address components. As such, `geocoder.LocationsGeocoder` can take in a DataFrame or list of dict's with address components. Also, `geocoder.LocationsGeocoder` will accept lists of string addresses, but it will perform less effectively than using address components. 
 
 ```python
 >>> from bbd import geocoder
@@ -200,7 +200,7 @@ Data exported to VAN will usually be in a tab-separated value text file containi
 >>> path = r"path/to/save/file.tsv"
 >>>
 >>> # Make the geolocator object with data, a valid email, and a save path.
->>> geolocator = geocoder.GeocodeLocations(data, valid_email, path)
+>>> geolocator = geocoder.LocationsGeocoder(data, valid_email, path)
 >>> # Finally run the geolocator to begin the process.
 >>> geolocator.run()
 ```
@@ -229,17 +229,17 @@ Say we are geocoding addresses all of which are in Volusia County, Florida but d
 >>>             'country':'United States'
 >>>     }
 >>> # Defaults only loaded in if data is structured with Address Components.
->>> geolocator = geocoder.GeocodeLocations(data, valid_email, path, defaults)
+>>> geolocator = geocoder.LocationsGeocoder(data, valid_email, path, defaults)
 >>> geolocator.run()
 ```
 
 
-Since only one address can be geocoded per second, this process is very long running for large datasets (n=100,000 is roughly 24hrs runtime). In order to allow for data verification before commiting the full runtime, GeocodeLocations allows for running only a subset of data through the batch_size and num_batches arguments.
+Since only one address can be geocoded per second, this process is very long running for large datasets (n=100,000 is roughly 24hrs runtime). In order to allow for data verification before commiting the full runtime, LocationsGeocoder allows for running only a subset of data through the batch_size and num_batches arguments.
 
 ```python
 >>> # Setting batch_size & num_batches allows you to run a subset of data first before 
 >>> # committing to the long run time of the full dataset.
->>> geolocator = geocoder.GeocodeLocations(data, valid_email, path, batch_size = 300)
+>>> geolocator = geocoder.LocationsGeocoder(data, valid_email, path, batch_size = 300)
 >>> geolocator.run(num_batches = 2)
 ```
 

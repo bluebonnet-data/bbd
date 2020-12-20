@@ -118,7 +118,7 @@ def encode_street_address(street) -> str:
         return result[0] # Match
 
 
-class GeocodeLocations:
+class LocationsGeocoder:
     """ Friendly wrapper to geocode large batches of data with Nominatim
     and saves to file in tab deliminated format located at path. This 
     will remember your progress across session and also allows user to 
