@@ -7,6 +7,10 @@ __pycache__
 .tox
 .python-version
 
+# Sublime environment
+*.sublime-project
+*.sublime-workspace
+
 # Build
 *.egg-info
 dist

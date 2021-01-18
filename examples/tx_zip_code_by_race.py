@@ -1,3 +1,23 @@
+"""Instructions for use
+
+1) Make sure python is installed
+
+2) Install the bluebonnet data package by running this command in your terminal:
+    pip install bbd
+
+3) Run this python file with the following command:
+   (from your terminal in the same folder as this file):
+    python tx_zip_code_by_race.py
+
+4) Wait patiently... the first time this runs it has to download about 800 Mb of
+us zip code shapefiles :/ but don't worry -- it caches them, so the next time it will
+run much much faster.
+
+5) Ta da, there should be a few exported data files.
+    - data_for_team.csv -- the data you requested, can copy and paste into a spreadsheet
+    - tx-zcta-map-B02001_00?E.html -- map of each demographic percentage. Open in web browser.
+"""
+
 import re
 from pathlib import Path
 
@@ -31,6 +51,7 @@ variables = {
 }
 
 # Extract and reformat census data
+print("getting census data")
 data = census.get_acs(
     geography=census.Geography.ZCTA,
     variables=list(variables.keys()),
@@ -42,6 +63,7 @@ data = census.get_acs(
 )
 
 # Get the shapefile
+print("getting shapefile (takes a long time on the first run)")
 shapefile_dir = census.get_shapefile(
     geography=census.Geography.ZCTA,
     state="tx",
@@ -52,6 +74,7 @@ shapefile_dir = census.get_shapefile(
 # We only want specific zctas
 # In the future the bbd library should be able to handle this internally
 # Otherwise it might be worth just biting the bullet and using numpy
+print("writing output data")
 with open(here / "tx_harris_county_zctas.txt", "r") as f:
     valid_zctas = [line.rstrip() for line in f.readlines()]
 
@@ -98,6 +121,7 @@ for census_code, description in variables.items():
     if not re.match(r"B02001_00[2-9]E", census_code):
         continue
 
+    print(f"creating map for {census_code}: {description}")
     gis.make_map(
         shapefile_dir,
         valid_data,

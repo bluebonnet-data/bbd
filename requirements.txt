@@ -1,0 +1,21 @@
+# =================================================
+# +++++++++++++++ REQUIRED PACKAGES +++++++++++++++
+# =================================================
+
+## Data & I/O Packages ##
+requests
+us
+pandas
+
+## Visualization Packages ##
+shapely
+folium
+branca
+
+## GIS Packages ##
+pyshp
+geopy
+
+## Testing & Display ##
+tqdm
+pytest
