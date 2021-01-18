@@ -1,4 +1,4 @@
-__version__ = "0.0.6"
+__version__ = "0.0.7"
 
 # TODO add relevant imports...
 from .working_directory import working_directory
