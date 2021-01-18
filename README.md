@@ -19,9 +19,18 @@ For a running start, you can copy the [examples](examples/) folder to your machi
 
 ## Walkthrough
 
-Follow along with this walkthrough to learn more detailed infomation about using this library.
+Follow along with this walkthrough to learn more detailed infomation about using this library and it's submodules.
 
-### Getting Census Data
+| Module                         |
+| ------                         |
+| [Census](#census-module)     |
+| [GIS](#gis-module)           |
+| [Geocoder](#geocoder-module) |
+
+
+### Census Module
+
+#### Getting Census Data
 First, find the data you want to visualize. This is often easiest through the census API, and the next bit of text will read a bit like a "How to Get Census Data" tutorial.
 
 For our working example, we'll use median household income (which is coded in the census data as as "DP03_0062E").
@@ -72,7 +81,7 @@ When you request it from the API with `get_acs`, it is automatically converted t
 }
 ```
 
-### Getting Shapefiles
+#### Getting Shapefiles
 
 Luckily, the census provides shapefiles for pretty much every `GEO_ID` you can find in the census API. You can automatically download them like this:
 
@@ -87,7 +96,7 @@ Luckily, the census provides shapefiles for pretty much every `GEO_ID` you can f
 
 To get these files manually, just head to [this website](https://www.census.gov/cgi-bin/geo/shapefiles/index.php) and select the relevent geography/location.
 
-### Match Census Data GEO ID to Shapefile GEO ID
+#### Match Census Data GEO ID to Shapefile GEO ID
 
 I happen to know that the GEO_ID in the shapefile is stored under the key "GEOID", and is only 4 digits long. There are reasons for this [described here](https://www.census.gov/programs-surveys/geography/guidance/geo-identifiers.html), but all we need to do is make an entry for our census data that matches the shapefile.
 
@@ -126,7 +135,7 @@ python -m pip install pyshp
 
 You can also of course simply view the property table in your favorite GIS software (e.g. [the free QGIS](https://qgis.org/en/site/forusers/download.html)).
 
-### Create Data to Color By
+#### Create Data to Color By
 
 The only thing better than a map is a map with color. You know the saying. The column to color by must be numeric.
 
@@ -135,7 +144,7 @@ The only thing better than a map is a map with color. You know the saying. The c
 >>> data["Median Household Income"] = [float(x) for x in data["DP03_0062E"]]
 ```
 
-### Create Nicely Formatted String for ToolTip
+#### Create Nicely Formatted String for ToolTip
 
 We also want our map to have nice interactive tooltips so that you can see information about each shape by hovering over it with your mouse! To visualize the income, I'll just add comma separators and a $ sign.
 
@@ -145,7 +154,9 @@ We also want our map to have nice interactive tooltips so that you can see infor
 >>> ]
 ```
 
-### Create Map!
+### GIS Module
+
+#### Create Map!
 
 Finally, we can create the leaflet map and save it to our machine.
 
@@ -162,6 +173,75 @@ Finally, we can create the leaflet map and save it to our machine.
 Simply open `path/to/save/map.html` in your favorite browser to view your map!
 
 ![CO Map](ext/co.png)
+
+### Geocoder Module
+
+#### Geocode Addresses
+
+The geocoder module allows us to use OpenStreetMap's Nominatim api to geocode large batches of addresses slowly but for free! 
+
+```- 
+Warning! Per Nominatim's Terms of Usage, this process may not be run in parallel.
+```
+
+If we have Addresses from VAN or another source that we want to map, we can use the geocoder submodule to get the Latitude, Longitude pair for each address.
+
+Data exported to VAN will usually be in a tab-separated value text file containing columns with address components. As such, `geocoder.LocationsGeocoder` can take in a DataFrame or list of dict's with address components. Also, `geocoder.LocationsGeocoder` will accept lists of string addresses, but it will perform less effectively than using address components. 
+
+```python
+>>> from bbd import geocoder
+>>> import pandas as pd
+>>> 
+>>> # data can be pd.DataFrame, list of dicts w/ address components, or list of str addresses
+>>> data = pd.read_csv("examples/data/example_addresses.tsv", sep = "\t")
+>>> # Set a valid email to pass to Nominatim as user_agent.
+>>> valid_email = 'replace_with_your_email@address.com'
+>>> # Path to the save file for your geocoded results (Will be in tab-separated value format)
+>>> path = r"path/to/save/file.tsv"
+>>>
+>>> # Make the geolocator object with data, a valid email, and a save path.
+>>> geolocator = geocoder.LocationsGeocoder(data, valid_email, path)
+>>> # Finally run the geolocator to begin the process.
+>>> geolocator.run()
+```
+
+
+The Components of an address are: 
+
+| Address Component | Alias             | 
+| ----------------- | -----             |
+| Street            | Address           |
+| City              |                   | 
+| County            |                   |
+| State             |                   |
+| Postalcode        | Zip, Zip5, Postal |
+| Country\*         |                   |
+
+\*Country is set to United States by default.
+
+
+Say we are geocoding addresses all of which are in Volusia County, Florida but do not explicitly define the county. Some of these addresses are in Orange City, without setting the default county the Nominatim parser may incorrectly interpret the address as in Orange County and provide the wrong coordinates (real example).
+
+```python
+>>> defaults = {
+>>>             'county':'Volusia', 
+>>>             'state':'Florida', 
+>>>             'country':'United States'
+>>>     }
+>>> # Defaults only loaded in if data is structured with Address Components.
+>>> geolocator = geocoder.LocationsGeocoder(data, valid_email, path, defaults)
+>>> geolocator.run()
+```
+
+
+Since only one address can be geocoded per second, this process is very long running for large datasets (n=100,000 is roughly 24hrs runtime). In order to allow for data verification before commiting the full runtime, LocationsGeocoder allows for running only a subset of data through the batch_size and num_batches arguments.
+
+```python
+>>> # Setting batch_size & num_batches allows you to run a subset of data first before 
+>>> # committing to the long run time of the full dataset.
+>>> geolocator = geocoder.LocationsGeocoder(data, valid_email, path, batch_size = 300)
+>>> geolocator.run(num_batches = 2)
+```
 
 ---
 Developed by [Bluebonnet Data](https://www.bluebonnetdata.org/)

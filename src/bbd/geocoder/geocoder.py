@@ -41,7 +41,7 @@ def get_geocoder(email):
     >>> geocode = get_geocoder(email)
     AssertionError: Must enter a valid email
     """
-    #Must enter a valid email
+    # Must enter a valid email
     assert is_valid_email(email), "Must enter a valid email"
     geolocator=Nominatim(user_agent=email)
     geocoder=RateLimiter(geolocator.geocode, min_delay_seconds=1)
@@ -76,14 +76,14 @@ def get_reverse_geocoder(email):
     >>> reverse_coder = get_reverse_geocoder(email)
     AssertionError: Must enter a valid email
     """
-    #Must enter a valid email
+    # Must enter a valid email
     assert is_valid_email(email), "Must enter a valid email"
     geolocator = Nominatim(user_agent=email)
     reverse_geocoder = RateLimiter(geolocator.reverse, min_delay_seconds=1)
     return reverse_geocoder
 
 
-def street_encode(street) -> str:
+def encode_street_address(street) -> str:
     """Default street_encoder for GeocodeLocation.
 
     Gets street address while removing secondary unit designators.
@@ -96,37 +96,29 @@ def street_encode(street) -> str:
     street : str
         a string street component of address
 
-    >>> street_encode("123 Test St")
+    >>> encode_street_address("123 Test St")
     "123 Test St"
-    >>> street_encode("456 Test Way apt 375")
+    >>> encode_street_address("456 Test Way apt 375")
     "456 Test Way"
-    >>> street_encode("420 Test Ave Unit 5")
+    >>> encode_street_address("420 Test Ave Unit 5")
     "420 Test Ave"
     """
-    pattern = r"^.*\S(?=(?:\s+)(?:[Aa]p(?:ar)?t(?:ment)? |[Uu]nit |#|[Ll]ot |"\
-              r"[Rr](?:oo)?m |[Bb](?:ui)?ld(?:in)?g |[Uu]pp?e?r|[Ll]o?we?r|"\
-              r"[Ss](?:ui)?te |[Ff](?:l )?(?:rnt)?|[Tt]r(?:ai)?le?r |[Dd]ept ))"
+    pattern = (
+        r"^.*\S(?=(?:\s+)(?:[Aa]p(?:ar)?t(?:ment)? |[Uu]nit |#|[Ll]ot |"
+        r"[Rr](?:oo)?m |[Bb](?:ui)?ld(?:in)?g |[Uu]pp?e?r|[Ll]o?we?r|"
+        r"[Ss](?:ui)?te |[Ff](?:l )?(?:rnt)?|[Tt]r(?:ai)?le?r |[Dd]ept ))"
+    )
     try:
         result = re.search(pattern, street) or street
     except TypeError:
         result = ""
-    if type(result) == str:
-        return result #No match
+    if type(result) is str:
+        return result # No match
     else:
-        return result[0] #Match
-    #try: #Python >=3.7
-    #    if type(result) is re.Match:
-    #        #want only first result.
-    #        return result[0]
-    #    return result
-    #except AttributeError: #Python<3.7
-    #    if type(result) == str:
-    #        return result
-    #    else:
-    #        return result[0]
+        return result[0] # Match
 
 
-class GeocodeLocations:
+class LocationsGeocoder:
     """ Friendly wrapper to geocode large batches of data with Nominatim
     and saves to file in tab deliminated format located at path. This 
     will remember your progress across session and also allows user to 
@@ -164,7 +156,8 @@ class GeocodeLocations:
              "Country" : str country component address
                          (if applicable, default will set country to US)
         For list of strings:
-            Each item should str full address to pass as query.
+            Each item is a complete address 
+            e.g. "1315 10th St, Sacramento, CA 95814".
 
     email : str
         A valid email address as str to pass to Nominatim as user_agent.
@@ -175,7 +168,7 @@ class GeocodeLocations:
 
     batch_size : (Optional) int
         Number of batches to geocode at a time. Useful for running subset of
-        data. Will determin size of batch for run(num_batches) and size of 
+        data. Will determine size of batch for run(num_batches) and size of 
         progress bar while running.
 
     defaults : (Optional) dict
@@ -192,14 +185,14 @@ class GeocodeLocations:
 
     keep_index : (Optional) bool
         Whether to use the index of data for the geocoded result. If 
-        False, will use 
+        False, will construct index like range(len(data)).
         It is recommended to use the same index for the inputted data
         to easily merge the data.
         True by default.
 
     Properties
     ----------
-    street_encode : func
+    street_encode : callable
         A function of 1 argument used to encode the street address. The 
         default is street_encode(address) used to remove secondary 
         descriptors from the street address. This is recommended 
@@ -207,11 +200,12 @@ class GeocodeLocations:
         secondary descriptors attached and therefore will not be 
         geocoded.
 
-    geocoder : str
-        Enter email as str to change geocoder user_agent.
+    geocoder : geopy.extras.RateLimiter
+        Enter a function inheriting from geopy.geocoders.Geocoder wrapped
+        by geopy.extras.RateLimiter
 
     email : str
-        Alias for geocoder
+        Email str to pass to Nominatim as user_agent
 
     Methods
     -------
@@ -224,7 +218,6 @@ class GeocodeLocations:
         WARNING: This method will overwrite file at path, do not use
         unless you want to restart geocoding or if path is a path to 
         existing file.
-
     """
 
     _cache_size = 4000
@@ -233,9 +226,8 @@ class GeocodeLocations:
                  keep_index = True, index_name = ""):
         """Constructor for bbd.geocoder.GeocodeLocations"""
 
-        #Creates geocoder with email passed as user_agent
-        self.geocoder = email #self.email is alias for self.geocoder
-        self.__real_geocoder = self._geocoder #for testing
+        # Creates geocoder with email passed as user_agent
+        self.geocoder = email # self.email is alias for self.geocoder
 
         self.defaults = defaults.copy()
 
@@ -252,9 +244,9 @@ class GeocodeLocations:
         except AttributeError:
             self.index_name = ""
 
-        #Verifying address components.
+        # Verifying address components.
         if len(self.data.columns) > 1:
-            #Components of address that will be passed to Nominatim.
+            # Components of address that will be passed to Nominatim.
             component_list = ['address', 'street', 'city', 'county', 
                               'state', 'country', 'zip5', 'zip', 
                               'postal', 'postalcode']
@@ -263,79 +255,82 @@ class GeocodeLocations:
                                   if col.lower() in component_list]
 
             if not self.included_cols:
-                raise ValueError("If data a pd.DataFrame with multiple "\
-                                 "columns or a list of dictionaries, it "\
-                                 "must include labels/keys for at least "\
+                raise ValueError("If data a pd.DataFrame with multiple "
+                                 "columns or a list of dictionaries, it "
+                                 "must include labels/keys for at least "
                                  "some components of an address.")
 
-            #Defaults must be dict of address components.
+            # Defaults must be dict of address components.
             if not all([key.lower() in component_list for key in defaults]):
-                raise ValueError("All keys in defaults must be components"\
+                raise ValueError("All keys in defaults must be components"
                                  "of an address.")
         else:
             self.included_cols = [self.data.columns[0]]
 
         self.batch_size = batch_size
 
-        #Check file status then load or create file.
+        # Check file status then load or create file.
         self.path = Path(path).resolve()
         try:
-            #Load already geocoded results.
-            self.locations = pd.read_csv(self.path, sep = '\t',
-                                         index_col = self.index_name or 0)
-            
-            #check that self.locations is appropriate file.
-            if not all([col in self.locations.columns for col 
-                       in ["latitude", 'longitude', 'address']]):
-                raise ValueError(f"Path {self.path} is an unrelated file!")
-
-            self._load_queue()
-
-        #Has never been run before.
+            # Load already geocoded results.
+            self._init_existing_file()
+        # Has never been run before.
         except FileNotFoundError:
             self.locations = pd.DataFrame(columns = ['latitude', 
                                                      'longitude', 
                                                      'address'])
-            self._make_file(path)
-            self._fill_queue() 
+            self._init_new_file()
 
-        #Set default street encoder
-        self._street_encode = street_encode
+        # Set default street encoder
+        self.street_encode = encode_street_address
 
 
-    def _make_file(self, path):
-        """Make new file at self.path and put in the header."""
+    def _init_new_file(self):
+        """Make new file at self.path and put in the header, then 
+        fills _queue
+        """
         header = f"{self.index_name}\tlatitude\tlongitude\taddress\n"
-        with open(path, "w") as f:
+        with open(self.path, "w") as f:
             f.write(header)
 
-
-    def _fill_queue(self):
-        """Fill Queue as copy from data's index."""
-        #Set queue
+        # Filling _queue
         self._queue = deque(self.data.index)
 
-        #Set batch info: Only used for display purposes
+        # Set batch info: Only used for display purposes
         self.tot_batches = len(self._queue)//self.batch_size + 1
         self.curr_batch = 1 #curr_batch not zero indexed.
 
 
-    def _load_queue(self):
-        """Set Queue to only remaining addresses."""
-        #Set queue
+    def _init_existing_file(self):
+        """Load existing file at self.path and verifies it is related to
+        this data. Then loads the _queue based on file. 
+        """
+        # Load already geocoded results.
+        self.locations = pd.read_csv(self.path, sep = '\t',
+                                     index_col = self.index_name or 0)
+            
+        # check that self.locations is appropriate file.
+        if not all([col in self.locations.columns for col 
+                    in ["latitude", 'longitude', 'address']]):
+            raise ValueError(f"Path {self.path} is an unrelated file! "
+                              "File should be generated by this "
+                              "program and contain columns for "
+                              "latitude, longitude, and address.")
+
+        # Set _queue
         self._queue = deque([i for i in self.data.index if i 
                              not in self.locations.index])
 
         
-        #Set batch info: Only used for display purposes
+        # Set batch info: Only used for display purposes
         tot_run = len(self.data.index) - len(self._queue)
 
         self.tot_batches = len(self.data.index)//self.batch_size + 1
         self.curr_batch = tot_run//self.batch_size + 1
 
 
-    #_run_geocoder exists to provide cache to geocoder.
-    #turns mutable dict input into immutable kwargs.
+    # cache is for appeasing the Nominatim gods.
+    # when same address is runned multiple times e.g. an apartment bldg.
     @lru_cache(maxsize = _cache_size)
     def _run_geocoder(self, *args, **kwargs
                        ) -> geopy.location.Location or None:
@@ -344,7 +339,7 @@ class GeocodeLocations:
             return self.geocoder(*args)
 
         elif kwargs and not args:
-            return self.geocoder(kwargs) #not unpacked to pass dict.
+            return self.geocoder(kwargs) # not unpacked to pass dict.
 
         else:
             _msg = "Either pass full address as arg or components as keywords"
@@ -364,12 +359,10 @@ class GeocodeLocations:
         address = self.data.loc[i, col]
         
         result = self._run_geocoder(address)
-        try:
-            return result.latitude, result.longitude, result.address
-
-        #AttributeError typically occurs if no result from geocoder.
-        except AttributeError:
+        if result is None:
             return None, None, address
+        else:
+            return result.latitude, result.longitude, result.address
 
 
     def _process_address_components(self, i):
@@ -384,39 +377,39 @@ class GeocodeLocations:
 
             Returns formatted (key, value) pair
             """
-            #With components address is assumed to be street component
+            # With components address is assumed to be street component
             if key.lower() == "address" or key.lower() == "street":
                 return "street", self.street_encode(value)
 
-            elif (key.lower() in "zip5" or key.lower() == "postal"):
+            elif (key.lower() in ("zip5", "zip", "zipcode")
+                  or key.lower() == "postal"):
                 return "postalcode", value
 
             else:
                 return key.lower(), value
         
-        #Unpack components in self.data
+        # Unpack components in self.data
         address = {key: value for key, value in 
                    [component_formatter(col, self.data.loc[i, col]) 
                    for col in self.included_cols]}
 
-        #Set default components in defaults
+        # Set default components in defaults
         for key, value in zip(self.defaults, self.defaults.values()):
             key, value = component_formatter(key, value)
             address[key] = value
 
         result = self._run_geocoder(**address)
-        try:
-            return result.latitude, result.longitude, result.address
 
-        #AttributeError typically occurs if no result from geocoder
-        except AttributeError:
-            #Format Address in proper order.
+        if result is None:
+            # Format Address in proper order.
             formatted_address = ", ".join([str(address[key]) for key in 
                                           ['street', 'city', 
                                           'county', 'state', 
                                           'country', 'postalcode']
                                           if key in address])
             return None, None, formatted_address
+        else:
+            return result.latitude, result.longitude, result.address
 
 
     def _run_batch(self, batch_list):
@@ -427,54 +420,55 @@ class GeocodeLocations:
         batch - list of indexes from queue to run through 
                 self.geocoder.
         """
-        #tqdm for progress bar.
+        # tqdm for progress bar.
         with open(self.path, "a") as f:
             desc = f"{self.curr_batch}/{self.tot_batches}"
             for i in tqdm(batch_list, desc = desc):
-                #For list of str or dataframe of 1 column
+                # For list of str or dataframe of 1 column
                 if (len(self.data.columns) == 1 
-                        or (len(self.included_cols) == 1 
-                            and self.included_cols[0] == 'address')):
+                        or len(self.included_cols) == 1 
+                            and self.included_cols[0] == 'address'):
                     lat, lon, address = self._process_address_string(i)
 
-                #For DataFrame or list of dicts
+                # For DataFrame or list of dicts
                 else:
                     lat, lon, address = self._process_address_components(i)
 
-                #Add processed addresses to self.locations
+                # Add processed addresses to self.locations
                 self.locations.loc[i, ['latitude', 
                                        'longitude', 
                                        'address']] = lat, lon, address
 
-                #Save processed address to path.
-                f.write(f"{i}\t{lat or ''}\t{lon or ''}\t{address}\n")
+                # Save processed address to path.
+                f.write(f'{i}\t{lat or ""}\t{lon or ""}\t"{address}"\n')
 
 
     def run(self, num_batches=None):
-        """
+        """Run num_batches batches of addresses through geocoder.
+        Returns current progess as pd.DataFrame.
         """
         if num_batches is None:
             num_batches = len(self._queue)//self.batch_size + 1
-            print("Beginning Geocoding: This may take many hours. "\
+            print("Beginning Geocoding: This may take many hours. "
                   "Progress saved as it goes.")
 
         if num_batches <= 0 or len(self._queue) == 0:
             print("All done!", flush = True)
             return self.locations
 
-        batch = [] #need to decide how to pull batches from queue
+        batch = [] # need to decide how to pull batches from queue
         for i in range(self.batch_size):
             try:
                 batch.append(self._queue.popleft())
             except IndexError:
-                pass #reached end of Queue
+                break # reached end of Queue
 
         print(f"Running batch {self.curr_batch} of {self.tot_batches}: ", 
               flush = True)
         self._run_batch(batch)
 
         print("Batch complete!", flush = True)
-        self.curr_batch += 1 #Update batch count
+        self.curr_batch += 1 # Update batch count
         
         return self.run(num_batches-1)
 
@@ -486,21 +480,19 @@ class GeocodeLocations:
         existing file.
         """
         if self.path.exists():
-            warn_msg = f"""WARNING:
-    This will overwrite file at {self.path}...
-    Type 'DELETE' to continute.
-            """
+            warn_msg =(f"WARNING:\n   "
+                       f"This will overwrite file at {self.path}...\n   "
+                       f"Type 'DELETE' to continute.")
             confirmation = input(warn_msg)
 
             if confirmation != "DELETE":
                 print("File not reset.")
-                return #Exit without overwritting file
+                return # Exit without overwritting file
 
             else:
                 print(f"File at {self.path} was reset.")
 
-        self._make_file(self.path)
-        self._fill_queue()
+        self._init_new_file()
 
 
     @property
@@ -510,20 +502,18 @@ class GeocodeLocations:
 
 
     @street_encode.setter
-    def street_encode(self, new):
+    def street_encode(self, new_encoder):
         """setter for _street_encode. enforces _street_encode 
         must be a callable with 1 arg.
         """
-        try:
-            sig = signature(new)
-        except TypeError:
-            print("Encoder not updated: Encoder must be callable")
-        else:
-            if len(sig.parameters) == 1:
-                self._street_encode = new
-            else:
-                print("Encoder not updated: Encoder must be function of 1"\
-                      " argmuent taking str address to str encoded address")
+        if not callable(new_encoder):
+            raise ValueError("Encoder must be callable")
+
+        if not len(signature(new_encoder).parameters) == 1:
+            raise ValueError("Encoder must be function of 1 argmuent "
+                             "taking str address to str encoded address")
+
+        self._street_encode = new_encoder
 
 
     @property
@@ -540,43 +530,19 @@ class GeocodeLocations:
             try:
                 self._geocoder = get_geocoder(new)
             except AssertionError:
-                #Will keep asking for new email until valid one input.
+                # Will keep asking for new email until valid one input.
                 print("Error: Must be a valid email...")
                 new_email = input("Please enter a valid email: ")
-                self.geocoder = new_email #recursion
+                self.geocoder = new_email # recursion
 
         elif type(new) == geopy.extra.rate_limiter.RateLimiter:
             self._geocoder = new
 
         else:
-            errormsg = "geocoder must be str email to change Nominatim "\
-            "user_agent, or a geopy geocoder wrapped in geopy RateLimiter."
+            errormsg = ("geocoder must be str email to change Nominatim "
+                        "user_agent, or a geopy geocoder wrapped in geopy"
+                        " RateLimiter.")
             raise ValueError(errormsg)
 
 
     email = geocoder # Email is Alias for geocoder.
-
-
-    def _set_test_geocoder(self):
-        """Method for testing. Will change _geocoder to function that 
-        returns geopy.location.Location for Evan's Hall, Berkeley, CA
-        and occasionally returns None. 
-
-        Undo with either:
-        self.email = str_valid_email 
-        or
-        self.geocoder = str_valid_email
-        """
-        #Go Bears!
-        evans_hall = self.__real_geocoder("Evan's Hall, Berkeley, CA")
-        def test_generator():
-            n = 0
-            while True:
-                n += 1
-                if n%10 == 0:
-                    yield None
-                else:
-                    yield evans_hall
-        gen = test_generator()
-        self._geocoder = lambda *args, **kwargs: next(gen)
-
