@@ -245,3 +245,21 @@ Since only one address can be geocoded per second, this process is very long run
 
 ---
 Developed by [Bluebonnet Data](https://www.bluebonnetdata.org/)
+
+
+
+## Developing bbd
+To develop bbd, first clone the repository, then set up a virtual environment locally
+```console
+git clone https://github.com/bluebonnet-data/bbd
+virtualenv venv
+source venv/bin/active
+```
+
+Then install the *local* package:
+```console
+pip install -e .
+```
+
+To ensure pytest is referencing your local package installation, you may also need to follow the steps here:
+https://stackoverflow.com/questions/35045038/how-do-i-use-pytest-with-virtualenv
