@@ -11,5 +11,6 @@ from . import census
 from . import fec
 from . import gis
 from . import models
+from . import elections
 
-__all__ = [working_directory, geocoder, census, fec, gis, models]
+__all__ = [working_directory, geocoder, census, fec, gis, models, elections]
