@@ -9,7 +9,7 @@ import requests
 
 from ..working_directory import working_directory
 
-from .geography import Geography
+from ..models import Geography
 from .us import state_to_fips
 
 """Maps year to congressional district number"""

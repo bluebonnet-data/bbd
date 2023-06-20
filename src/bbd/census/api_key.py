@@ -17,7 +17,7 @@ class _ApiKey:
                 "Value should be a 'str'"
             )
         else:
-            self._key = key_value
+            self._key = key_value.strip()
 
 
 api_key = _ApiKey()

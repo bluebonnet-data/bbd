@@ -17,6 +17,8 @@ def get_fec(
     params: dict,
     cache: bool = False
 ):
+    raise ValueError("TEST")
+
     """Get OpenFEC data. See https://api.open.fec.gov/developers for a list of
     endpoints and the parameters associated with each endpoint."""
     call = construct_api_call(endpoint, params)

@@ -5,7 +5,7 @@ import requests
 
 from ..working_directory import working_directory
 
-from .geography import Geography
+from ..models import Geography
 from .datasets import DataSets
 from .api_key import api_key
 from .load import load_json_str, load_json_file
