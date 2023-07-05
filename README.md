@@ -38,14 +38,14 @@ For our working example, we'll use median household income (which is coded in th
 We can simply downloaded the census data like so:
 
 ```python
->>> from bbd import census
->>> data = census.get_acs(
->>>    geography=census.Geography.CD,
->>>    variables="group(DP03),NAME",
->>>    year=2018,
->>>    state="co",
->>>    dataset=census.DataSets.ACS5_PROFILE,
->>> )
+>> > from bbd import census
+>> > data = census.get_acs(
+            >> > geography = census.Geography.CD,
+>> > variables = "group(DP03),NAME",
+>> > year = 2018,
+>> > state = "co",
+>> > dataset = census.DataSet.ACS5_PROFILE,
+>> > )
 ```
 
     https://api.census.gov/data/2018/acs/acs1/profile?get=group(DP03),NAME&for=congressional%20district:*&in=state:08

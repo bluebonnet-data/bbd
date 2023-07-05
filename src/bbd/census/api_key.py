@@ -12,7 +12,7 @@ class _ApiKey:
     @key.setter
     def key(self, key_value: str):
         if not isinstance(key_value, str):
-            raise ValueError(
+            raise TypeError(
                 f"Cannot set census api key to {key_value} of type {type(key_value)}. "
                 "Value should be a 'str'"
             )

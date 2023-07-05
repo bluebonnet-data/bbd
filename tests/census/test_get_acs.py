@@ -8,7 +8,7 @@ def _construct_call(variables):
         geography=models.Geography.STATE,
         variables=variables,
         year=2018,
-        dataset=census.DataSets.ACS5_DETAIL,
+        dataset=census.DataSet.ACS5_DETAIL,
     )
 
 
