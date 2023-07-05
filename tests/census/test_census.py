@@ -35,7 +35,7 @@ def test_make_query():
     api_key = API_KEY
     year = 2019
     dataset = DataSet.ACS1
-    variables = ["B01001_001E"]
+    variables = ["NAME", "B01001_001E"]
     geography_values = OrderedDict()
     geography_values[Geography.STATE] = "36"
     geography_values[Geography.COUNTY] = "*"
@@ -44,3 +44,64 @@ def test_make_query():
     result = census._make_query(variables)
     print(result.json())
     assert result is not None
+
+def test_get_census_result():
+    api_key = API_KEY
+    year = 2019
+    dataset = DataSet.ACS1
+    variables = ["NAME", "B01001_001E"]
+    geography_values = OrderedDict()
+    geography_values[Geography.STATE] = "36"
+    geography_values[Geography.COUNTY] = "*"
+    geography_values[Geography.COUNTY_SUBDIVISION] = "*"
+    census = Census(api_key=api_key, geography_values=geography_values, year=year, dataset=dataset)
+    result = census.get_acs(variables)
+    print(f"result json: {result.data}")
+    assert result.data is not None
+
+def test_get_all_vars():
+    api_key = API_KEY
+    year = 2019
+    dataset = DataSet.ACS1
+    variables = ["NAME", "B01001_001E"]
+    geography_values = OrderedDict()
+    geography_values[Geography.STATE] = "36"
+    geography_values[Geography.COUNTY] = "*"
+    geography_values[Geography.COUNTY_SUBDIVISION] = "*"
+    census = Census(api_key=api_key, geography_values=geography_values, year=year, dataset=dataset)
+    df = census._get_all_vars()
+    assert len(df) > 0
+    print(df.head())
+
+def test_proportion_match():
+    search_string = "this is the first string"
+    comparison_string = "AND THIS, MY FRIEND, IS THE SECOND STRING"
+
+    api_key = API_KEY
+    year = 2019
+    dataset = DataSet.ACS1
+    variables = ["NAME", "B01001_001E"]
+    geography_values = OrderedDict()
+    geography_values[Geography.STATE] = "36"
+    geography_values[Geography.COUNTY] = "*"
+    geography_values[Geography.COUNTY_SUBDIVISION] = "*"
+    census = Census(api_key=api_key, geography_values=geography_values, year=year, dataset=dataset)
+    match_proportion = census._proportion_match(search_string, comparison_string)
+    print(match_proportion)
+    assert match_proportion > 0.50
+
+
+def test_census_explore():
+    api_key = API_KEY
+    year = 2019
+    dataset = DataSet.ACS1
+    geography_values = OrderedDict()
+    geography_values[Geography.STATE] = "36"
+    geography_values[Geography.COUNTY] = "*"
+    geography_values[Geography.COUNTY_SUBDIVISION] = "*"
+    census = Census(api_key=api_key, geography_values=geography_values, year=year, dataset=dataset)
+    search_string = "sex gender occupation geography"
+    number_of_results = 10
+    df = census.explore(search_string, number_of_results)
+    assert len(df.columns) == 3
+    print(df)
