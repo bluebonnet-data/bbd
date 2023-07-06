@@ -1,15 +1,5 @@
 from __future__ import annotations
-from anytree import Node, RenderTree
 import enum
-
-
-class GeographyTree():
-    TREE = Node("region"),
-    REGION = Node("region")
-    DIVISION = Node("division")
-    STATE = Node("state")
-    COUNTY = Node("county", parent=STATE)
-    SUBDIVISION = Node("county subdivision", parent=COUNTY)
 
 
 class Geography(enum.Enum):

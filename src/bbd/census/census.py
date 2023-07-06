@@ -1,17 +1,14 @@
 from __future__ import annotations
-
 import pandas as pd
-pd.set_option('display.max_columns', None)
 from dataclasses import dataclass, field
 from typing import Optional, OrderedDict
-# from collections import OrderedDict
 from bbd.census.census_table import CensusTable
 from bbd.models import geography
 import urllib.parse
 import requests
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-
+pd.set_option('display.max_columns', None)
 
 @dataclass
 class Census:
@@ -19,7 +16,7 @@ class Census:
     geography_values: OrderedDict[geography.Geography, str]
     year: str | int
     dataset: dataset.Dataset
-    results: list[str] = field(default_factory = list)
+    results: list[str] = field(default_factory = list) # list of CensusResult objects
     available_variables: pd.DataFrame = field(default_factory = pd.DataFrame) # dataframe of all available variables
     census_tables: list[CensusTable] = field(default_factory = list) # a list of CensusTable objects
 
@@ -37,7 +34,7 @@ class Census:
         statement_count = len(geo_statements)
         geo_url = ""
         for i in range(statement_count):
-            if i <statement_count:
+            if i < statement_count:
                 prefix = "for"
             else:
                 prefix = "in"
@@ -87,11 +84,6 @@ class Census:
                                                              attributes = [(item, label)])
                     else:
                         names_to_tables[group].attributes.append((item, label))
-            # df = pd.DataFrame()
-            # df["variable_id"] = [item.variable_id for item in names_to_tables.values()]
-            # df["variable_description"] = [item.variable_description for item in names_to_tables.values()]
-            # df["attributes"] = [item.attributes for item in names_to_tables.values()]
-            # df["attribute_names"] = df["attributes"].apply(lambda x: [item[0] for item in x])
             self.census_tables = names_to_tables
         return self.census_tables
 
@@ -108,10 +100,6 @@ class Census:
         df = df[["variable_id", "variable_description", "attribute_names", "match_proportion"]]
         return df.sort_values(by = "match_proportion", ascending = False).head(number_of_results)
 
-    def get_variable_details(self, variable_name: str):
-        df = self._get_all_vars()
-        selected_variable = df.loc[df["variable_name"] == variable_name]
-        return selected_variable
 
 class CensusResult():
     def __init__(self, response: requests.Reponse, variables: list[str]):

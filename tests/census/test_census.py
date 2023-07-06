@@ -3,13 +3,6 @@ from bbd.models import Geography
 from config import API_KEY
 from collections import OrderedDict
 
-def test_create_census():
-    api_key = API_KEY
-    geography = Geography.SUBDIVISION
-    year = 2018
-    dataset = DataSet.ACS1
-    census = Census(api_key = api_key, geography=geography, year=year, dataset=dataset)
-
 def test_build_url():
     api_key = "YOUR_KEY_GOES_HERE"
     year = 2019
@@ -92,9 +85,10 @@ def test_census_search_variables():
     geography_values[Geography.COUNTY] = "*"
     geography_values[Geography.COUNTY_SUBDIVISION] = "*"
     census = Census(api_key=api_key, geography_values=geography_values, year=year, dataset=dataset)
-    search_string = "sex gender occupation geography"
+    search_string = "sex by occupation of workers"
     number_of_results = 10
     df = census.search_variables(search_string, number_of_results)
     assert len(df) > 0
     assert len(df["match_proportion"]) > 0
+    assert len(df.columns) == 4
     print(df)
