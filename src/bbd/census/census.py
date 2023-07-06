@@ -1,14 +1,17 @@
 from __future__ import annotations
 
 import pandas as pd
+pd.set_option('display.max_columns', None)
 from dataclasses import dataclass, field
 from typing import Optional, OrderedDict
 # from collections import OrderedDict
+from bbd.census.census_table import CensusTable
 from bbd.models import geography
 import urllib.parse
 import requests
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+
 
 @dataclass
 class Census:
@@ -17,7 +20,8 @@ class Census:
     year: str | int
     dataset: dataset.Dataset
     results: list[str] = field(default_factory = list)
-    available_variables: pd.DataFrame = field(default_factory = pd.DataFrame)
+    available_variables: pd.DataFrame = field(default_factory = pd.DataFrame) # dataframe of all available variables
+    tables: list[CensusTable] = field(default_factory = list) # a list of CensusTable objects
 
     def _build_url(self, variables: list[str]):
         base_url = "https://api.census.gov/data"
@@ -49,7 +53,6 @@ class Census:
         return response
 
 
-
     def get_acs(self, variables) -> CensusResult:
         '''Query the database '''
         response = self._make_query(variables)
@@ -70,36 +73,39 @@ class Census:
             url = f"https://api.census.gov/data/{self.year}/{self.dataset.value}/variables.json"
             variable_data = requests.get(url)
             json = variable_data.json()
-            irrelevant_variables = ["for", "in", "ucgid"]
-            variables = [item for item in json["variables"] ]
-            concepts_to_attributes = {}
-            for item in variables:
-              one_variable = json["variables"][item]
-              label = one_variable["label"]
-              if "concept" in one_variable:
-                concept = one_variable["concept"]
-                labeled_variable = (item, label)
-                if concept not in concepts_to_attributes:
-                  concepts_to_attributes[concept] = [labeled_variable]
-                else:
-                  concepts_to_attributes[concept].append(labeled_variable)
-            concepts_column = concepts_to_attributes.keys()
-            attributes_column = concepts_to_attributes.values()
+            attribute_names = [item for item in json["variables"]]
+            names_to_tables = {}
+            for item in attribute_names:
+                one_attribute = json["variables"][item]
+                if "concept" in one_attribute and "label" in one_attribute and "group" in one_attribute:
+                    label = one_attribute["label"]
+                    concept = one_attribute["concept"]
+                    group = one_attribute["group"]
+                    if group not in names_to_tables:
+                        names_to_tables[group] = CensusTable(variable_id = group,
+                                                             variable_description = concept,
+                                                             attributes = [(item, label)])
+                    else:
+                        names_to_tables[group].attributes.append((item, label))
             df = pd.DataFrame()
-            df["concept"] = concepts_column
-            df["attributes"] = attributes_column
+            df["variable_id"] = [item.variable_id for item in names_to_tables.values()]
+            df["variable_description"] = [item.variable_description for item in names_to_tables.values()]
+            df["attributes"] = [item.attributes for item in names_to_tables.values()]
             df["attribute_names"] = df["attributes"].apply(lambda x: [item[0] for item in x])
             self.available_variables = df
         return self.available_variables
 
-    def explore(self, search_string: str, number_of_results: int):
+    def search_variables(self, search_string: str, number_of_results: int):
         df = self._get_all_vars()
-        proportion_matches = df["concept"].apply(lambda x: self._proportion_match(search_string, x))
+        proportion_matches = df["variable_description"].apply(lambda x: self._proportion_match(search_string, x))
         df["match_proportion"] = proportion_matches
-        df = df[["concept", "match_proportion", "attribute_names"]]
+        df = df[["variable_id", "variable_description", "attribute_names", "match_proportion"]]
         return df.sort_values(by = "match_proportion", ascending = False).head(number_of_results)
 
-
+    def get_variable_details(self, variable_name: str):
+        df = self._get_all_vars()
+        selected_variable = df.loc[df["variable_name"] == variable_name]
+        return selected_variable
 
 class CensusResult():
     def __init__(self, response: requests.Reponse, variables: list[str]):

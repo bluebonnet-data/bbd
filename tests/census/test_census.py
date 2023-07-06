@@ -71,12 +71,13 @@ def test_get_all_vars():
     census = Census(api_key=api_key, geography_values=geography_values, year=year, dataset=dataset)
     df = census._get_all_vars()
     assert len(df) > 0
+    print(df.columns)
+    print(df["attributes"])
     print(df.head())
 
 def test_proportion_match():
     search_string = "this is the first string"
     comparison_string = "AND THIS, MY FRIEND, IS THE SECOND STRING"
-
     api_key = API_KEY
     year = 2019
     dataset = DataSet.ACS1
@@ -91,7 +92,7 @@ def test_proportion_match():
     assert match_proportion > 0.50
 
 
-def test_census_explore():
+def test_census_search_variables():
     api_key = API_KEY
     year = 2019
     dataset = DataSet.ACS1
@@ -102,6 +103,7 @@ def test_census_explore():
     census = Census(api_key=api_key, geography_values=geography_values, year=year, dataset=dataset)
     search_string = "sex gender occupation geography"
     number_of_results = 10
-    df = census.explore(search_string, number_of_results)
-    assert len(df.columns) == 3
+    df = census.search_variables(search_string, number_of_results)
+    assert len(df) > 0
+    assert len(df["match_proportion"]) > 0
     print(df)
