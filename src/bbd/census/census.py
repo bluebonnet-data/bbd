@@ -21,7 +21,7 @@ class Census:
     dataset: dataset.Dataset
     results: list[str] = field(default_factory = list)
     available_variables: pd.DataFrame = field(default_factory = pd.DataFrame) # dataframe of all available variables
-    tables: list[CensusTable] = field(default_factory = list) # a list of CensusTable objects
+    census_tables: list[CensusTable] = field(default_factory = list) # a list of CensusTable objects
 
     def _build_url(self, variables: list[str]):
         base_url = "https://api.census.gov/data"
@@ -69,7 +69,7 @@ class Census:
         return proportion_match
 
     def _get_all_vars(self):
-        if len(self.available_variables) == 0:
+        if len(self.census_tables) == 0:
             url = f"https://api.census.gov/data/{self.year}/{self.dataset.value}/variables.json"
             variable_data = requests.get(url)
             json = variable_data.json()
@@ -87,16 +87,22 @@ class Census:
                                                              attributes = [(item, label)])
                     else:
                         names_to_tables[group].attributes.append((item, label))
-            df = pd.DataFrame()
-            df["variable_id"] = [item.variable_id for item in names_to_tables.values()]
-            df["variable_description"] = [item.variable_description for item in names_to_tables.values()]
-            df["attributes"] = [item.attributes for item in names_to_tables.values()]
-            df["attribute_names"] = df["attributes"].apply(lambda x: [item[0] for item in x])
-            self.available_variables = df
-        return self.available_variables
+            # df = pd.DataFrame()
+            # df["variable_id"] = [item.variable_id for item in names_to_tables.values()]
+            # df["variable_description"] = [item.variable_description for item in names_to_tables.values()]
+            # df["attributes"] = [item.attributes for item in names_to_tables.values()]
+            # df["attribute_names"] = df["attributes"].apply(lambda x: [item[0] for item in x])
+            self.census_tables = names_to_tables
+        return self.census_tables
 
     def search_variables(self, search_string: str, number_of_results: int):
-        df = self._get_all_vars()
+        names_to_tables = self._get_all_vars()
+        df = pd.DataFrame()
+        df["variable_id"] = [item.variable_id for item in names_to_tables.values()]
+        df["variable_description"] = [item.variable_description for item in names_to_tables.values()]
+        df["attributes"] = [item.attributes for item in names_to_tables.values()]
+        df["attribute_names"] = df["attributes"].apply(lambda x: [item[0] for item in x])
+
         proportion_matches = df["variable_description"].apply(lambda x: self._proportion_match(search_string, x))
         df["match_proportion"] = proportion_matches
         df = df[["variable_id", "variable_description", "attribute_names", "match_proportion"]]

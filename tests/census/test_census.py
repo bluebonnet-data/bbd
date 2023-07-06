@@ -3,18 +3,12 @@ from bbd.models import Geography
 from config import API_KEY
 from collections import OrderedDict
 
-def test_typical_usage():
-    key = 'abc123'
-    cen = Census(key, ...)
-
-    res : CensusResult = cen.get_acs(state='NY', county="Nassau")
-
 def test_create_census():
     api_key = API_KEY
     geography = Geography.SUBDIVISION
     year = 2018
     dataset = DataSet.ACS1
-    census = Census(api_key = api_key, geography = geography, year = year, dataset = dataset)
+    census = Census(api_key = api_key, geography=geography, year=year, dataset=dataset)
 
 def test_build_url():
     api_key = "YOUR_KEY_GOES_HERE"
@@ -69,11 +63,8 @@ def test_get_all_vars():
     geography_values[Geography.COUNTY] = "*"
     geography_values[Geography.COUNTY_SUBDIVISION] = "*"
     census = Census(api_key=api_key, geography_values=geography_values, year=year, dataset=dataset)
-    df = census._get_all_vars()
-    assert len(df) > 0
-    print(df.columns)
-    print(df["attributes"])
-    print(df.head())
+    names_to_tables = census._get_all_vars()
+    assert len(names_to_tables) > 50
 
 def test_proportion_match():
     search_string = "this is the first string"
