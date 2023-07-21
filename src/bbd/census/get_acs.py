@@ -16,7 +16,7 @@ def get_acs(
     geography: Geography,
     variables: Union[str, List[str]],
     year: Union[str, int] = 2018,
-    dataset: DataSet = DataSet.ACS5_DETAIL,
+    dataset: DataSet = DataSet.ACS5,
     state: Union[str, None] = None,
     county: Union[str, None] = None,
     cache: bool = False,
@@ -76,7 +76,7 @@ def construct_api_call(
     geography: Geography,
     variables: str | list[str],
     year:  str | int = 2018,
-    dataset: DataSet = DataSet.ACS5_DETAIL,
+    dataset: DataSet = DataSet.ACS5,
     state: Optional[str] = None,
     county: Optional[str] = None,
 ):

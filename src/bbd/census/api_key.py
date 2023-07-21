@@ -7,7 +7,7 @@ class _ApiKey:
         if self._key is None:
             raise ValueError("Census api key has not been set!")
         else:
-            return self._key
+             return self._key
 
     @key.setter
     def key(self, key_value: str):

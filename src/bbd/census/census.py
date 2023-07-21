@@ -49,7 +49,6 @@ class Census:
         response = requests.get(url)
         return response
 
-
     def get_acs(self, variables) -> CensusResult:
         '''Query the database '''
         response = self._make_query(variables)
@@ -87,19 +86,28 @@ class Census:
             self.census_tables = names_to_tables
         return self.census_tables
 
-    def search_variables(self, search_string: str, number_of_results: int):
-        names_to_tables = self._get_all_vars()
-        df = pd.DataFrame()
-        df["variable_id"] = [item.variable_id for item in names_to_tables.values()]
-        df["variable_description"] = [item.variable_description for item in names_to_tables.values()]
-        df["attributes"] = [item.attributes for item in names_to_tables.values()]
-        df["attribute_names"] = df["attributes"].apply(lambda x: [item[0] for item in x])
+    def _datafame_all_variables(self):
+        if len(self.available_variables) == 0:
+            names_to_tables = self._get_all_vars()
+            df = pd.DataFrame()
+            df["variable_id"] = [item.variable_id for item in names_to_tables.values()]
+            df["variable_description"] = [item.variable_description for item in names_to_tables.values()]
+            df["attributes"] = [item.attributes for item in names_to_tables.values()]
+            df["attribute_names"] = df["attributes"].apply(lambda x: [item[0] for item in x])
+            self.available_variables = df
+        return self.available_variables
 
-        proportion_matches = df["variable_description"].apply(lambda x: self._proportion_match(search_string, x))
-        df["match_proportion"] = proportion_matches
-        df = df[["variable_id", "variable_description", "attribute_names", "match_proportion"]]
-        return df.sort_values(by = "match_proportion", ascending = False).head(number_of_results)
-
+    def search_variables(self, search_string: Optional[str] = None, number_of_results: Optional[int] = None):
+        df = self._datafame_all_variables()
+        if search_string is not None:
+            proportion_matches = df["variable_description"].apply(lambda x: self._proportion_match(search_string, x))
+            df["match_proportion"] = proportion_matches
+            df = df[["variable_id", "variable_description", "attribute_names", "match_proportion"]]
+            df = df.sort_values(by="match_proportion", ascending=False).head(number_of_results)
+        if number_of_results is not None:
+            return df.head(number_of_results)
+        else:
+            return df.head()
 
 class CensusResult():
     def __init__(self, response: requests.Reponse, variables: list[str]):

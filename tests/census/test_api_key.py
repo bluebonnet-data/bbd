@@ -11,7 +11,7 @@ def test_api_key_required():
             geography=models.Geography.STATE,
             variables="B03003_001E",
             year=2018,
-            dataset=census.DataSet.ACS5_DETAIL,
+            dataset=census.DataSet.ACS5,
         )
 
 def test_can_request_data():
@@ -31,7 +31,7 @@ def test_can_call_census_api():
         geography=models.Geography.STATE,
         variables="B03003_001E",
         year=2018,
-        dataset=census.DataSet.ACS5_DETAIL,
+        dataset=census.DataSet.ACS5,
     )
 
     def callback(request: requests.Request, context):
