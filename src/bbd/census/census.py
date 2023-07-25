@@ -8,12 +8,18 @@ import urllib.parse
 import requests
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from bbd.census.census_result import CensusResult
+from bbd.census import geography_unit
+
+# Make pandas display properly; consider removing later
 pd.set_option('display.max_columns', None)
+
+
 
 @dataclass
 class Census:
     api_key: str
-    geography_values: OrderedDict[geography.Geography, str]
+    geography_units: list[geography_unit.GeographyUnit]
     year: str | int
     dataset: dataset.Dataset
     results: list[str] = field(default_factory = list) # list of CensusResult objects
@@ -22,26 +28,50 @@ class Census:
 
     def _build_url(self, variables: list[str]):
         base_url = "https://api.census.gov/data"
-
         # Collect all parts
         year = self.year
         dataset = self.dataset.value
         variables = ",".join(variables)
         key = self.api_key
-
-        # Parse the geography
-        geo_statements = list(self.geography_values.items())
-        statement_count = len(geo_statements)
         geo_url = ""
-        for i in range(statement_count):
-            if i < statement_count:
-                prefix = "for"
+
+        # parse geography
+        geographies = self.geography_units
+        for unit in geographies:
+            argument = unit.argument.value
+            label = urllib.parse.quote(unit.label.value)
+            value = unit.value
+            if value is None:
+                geo_url += f"{argument}={label}"
             else:
-                prefix = "in"
-            geo_url = geo_url + (f"&{prefix}={urllib.parse.quote(geo_statements[i][0].value)}:{geo_statements[i][1]}")
+                geo_url += f"{argument}={label}:{value}"
+
 
         full_url = f"{base_url}/{year}/{dataset}?get={variables}{geo_url}&key={key}"
         return full_url
+
+
+
+        # for i in range(statement_count):
+        #     if i < statement_count - 1:
+        #         prefix = "for"
+        #         #If the user wants every lower-level item, e.g. county in state,
+        #         # give them results for each individual county
+        #         if geo_statements[i][1] == "*":
+        #             geo_url = geo_url + (f"&{prefix}={geo_statements[i][0].value}")
+        #         # If the user wants no lower-level item, e.g. just net state information,
+        #         #give them only higher level results
+        #         elif geo_statements[i][1] is None:
+        #             geo_url = geo_url + (f"&{prefix}={geo_statements[i][0].value}:*")
+        #         else:
+        #             geo_url = geo_url + (
+        #                 f"&{prefix}={urllib.parse.quote(geo_statements[i][0].value)}:{geo_statements[i][1]}")
+        #     else:
+        #         prefix = "in"
+        #         geo_url = geo_url + (f"&{prefix}={urllib.parse.quote(geo_statements[i][0].value)}:{geo_statements[i][1]}")
+        #
+        # full_url = f"{base_url}/{year}/{dataset}?get={variables}{geo_url}&key={key}"
+        # return full_url
 
 
     def _make_query(self, variables):
@@ -109,9 +139,4 @@ class Census:
         else:
             return df.head()
 
-class CensusResult():
-    def __init__(self, response: requests.Reponse, variables: list[str]):
-        self.response = response
-        self.variables = variables
-        self.data = response.json()
 
