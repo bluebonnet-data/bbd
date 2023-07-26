@@ -39,12 +39,12 @@ class Census:
         geographies = self.geography_units
         for unit in geographies:
             argument = unit.argument.value
-            label = urllib.parse.quote(unit.label.value)
+            label = urllib.parse.quote(unit.label.value, safe = "()/")
             value = unit.value
             if value is None:
-                geo_url += f"{argument}={label}"
+                geo_url += f"{argument}{label}"
             else:
-                geo_url += f"{argument}={label}:{value}"
+                geo_url += f"{argument}{label}:{value}"
         full_url = f"{base_url}/{year}/{dataset}?get={input_strings}{geo_url}&key={key}"
         return full_url
 

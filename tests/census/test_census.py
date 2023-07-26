@@ -17,7 +17,7 @@ def test_build_url_no_nones():
     geography_units = [subdivision, state, county]
     census = Census(api_key=api_key, geography_units=geography_units, year=year, dataset=dataset)
     goal_url = "https://api.census.gov/data/2019/acs/acs1?get=NAME,B01001_001E&for=county%20subdivision:*&in=state:36&in=county:*&key=YOUR_KEY_GOES_HERE"
-    test_url = census._build_url(variables)
+    test_url = census._build_url(input_strings = variables)
     print(test_url)
     assert goal_url == test_url
 
