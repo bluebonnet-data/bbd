@@ -70,10 +70,10 @@ You would use this search function to find the relevant variable that you want, 
 Now that we know which variable (or variables) we are interested in, you have a few options. For example, you might want to simply tabulate that census variable.
 
 ```python
->>> from pprint import pprint
->>>
->>> table = bbd.get_acs(state="CO", variable="D06_001", view_by=bbd.COUNTY)
->>> pprint(table)
+>> > from pprint import pprint
+>> >
+>> > table = bbd.get_data(state="CO", variable="D06_001", view_by=bbd.COUNTY)
+>> > pprint(table)
 {
     "GEOID": [...]
     "NAME": [...]
@@ -95,12 +95,12 @@ This method should grab the same data as `get_acs`, and also pull the relevant s
 Of course, if the user wanted to they could also call `make_map` on their own if they had specific processing they wanted to first do with either the shapefiles or the data
 
 ```python
->>> table = bbd.get_acs(...)
->>> # process table
->>>
->>> shapefile_path = bbd.get_shapefiles(...)
->>> # process shapefiles
->>>
->>> bbd.make_map(table, shapefile_path, "map.html")
+>> > table = bbd.get_data(...)
+>> >  # process table
+>> >
+>> > shapefile_path = bbd.get_shapefiles(...)
+>> >  # process shapefiles
+>> >
+>> > bbd.make_map(table, shapefile_path, "map.html")
 ```
 

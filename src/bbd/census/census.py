@@ -60,7 +60,7 @@ class Census:
         response = requests.get(url)
         return response
 
-    def get_acs(self, variables) -> CensusResult:
+    def get_data(self, variables) -> CensusResult:
         '''Query the database '''
         response = self._make_query(variables)
         result = CensusResult(response=response, variables=variables)

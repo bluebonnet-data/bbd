@@ -113,7 +113,6 @@ def test_census_search_variables():
     api_key = API_KEY
     year = 2019
     dataset = DataSet.ACS1
-    geography_values = OrderedDict()
     state = GeographyUnit(argument=Arguments.in_input, label=Geography.STATE, value="36")
     county = GeographyUnit(argument=Arguments.in_input, label=Geography.COUNTY, value="*")
     subdivision = GeographyUnit(argument=Arguments.for_input, label=Geography.COUNTY_SUBDIVISION, value=None)
@@ -147,8 +146,31 @@ def test_acs_to_df():
     variables = ["NAME", "B01001_001E"]
     state = GeographyUnit(argument=Arguments.in_input, label=Geography.STATE, value="36")
     county = GeographyUnit(argument=Arguments.in_input, label=Geography.COUNTY, value="*")
-    subdivision = GeographyUnit(argument=Arguments.for_input, label=Geography.COUNTY_SUBDIVISION, value=None)
+    subdivision = GeographyUnit(argument=Arguments.for_input, label=Geography.COUNTY_SUBDIVISION, value= None)
     geography_units = [subdivision, state, county]
     census = Census(api_key=api_key, geography_units=geography_units, year=year, dataset=dataset)
-    result = census.get_acs(variables)
-    print(result.data)
+    result = census._make_query(variables = variables, groups = None)
+    import pandas as pd
+    json = result.json()
+    print(json[1])
+    # df = pd.DataFrame(columns=json[0])
+    for i in range(len(json)):
+        if i == 0:
+            df = pd.DataFrame(columns=json[i])
+        else:
+            df.loc[i] = json[i]
+    print(df)
+    # state: 36
+    # county: *
+    # subdivision: *
+    # data for each subdivision for each county in new york
+
+    # state: 36
+    # county: None
+    # subdivision: *
+    # Query not permitted
+
+    # state: 36
+    # county: *
+    # subdivision: None
+    # Query not permitted

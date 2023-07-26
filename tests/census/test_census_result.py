@@ -1,15 +1,21 @@
+from __future__ import annotations
 from bbd.census import Census, DataSet
 from bbd.models import Geography
 from config import API_KEY
-from collections import OrderedDict
+from bbd.census.geography_unit import GeographyUnit
+from bbd.census.arguments import Arguments
 
-#Set up census object to use on all tests
-api_key = API_KEY
-year = 2019
-dataset = DataSet.ACS1
-variables = ["NAME", "B01001_001E"]
-geography_values = OrderedDict()
-geography_values[Geography.STATE] = "36"
-geography_values[Geography.COUNTY] = "*"
-geography_values[Geography.COUNTY_SUBDIVISION] = "*"
-census = Census(api_key=api_key, geography_values=geography_values, year=year, dataset=dataset)
+
+# Make a sensible dataframe with the lowest level being "subdivision"
+def test_dataframe_subdivision_leaf():
+    api_key = API_KEY
+    year = 2019
+    dataset = DataSet.ACS1
+    variables = ["NAME", "B01001_001E"]
+    state = GeographyUnit(argument=Arguments.in_input, label=Geography.STATE, value="36")
+    county = GeographyUnit(argument=Arguments.in_input, label=Geography.COUNTY, value="*")
+    subdivision = GeographyUnit(argument=Arguments.for_input, label=Geography.COUNTY_SUBDIVISION, value=None)
+    geography_units = [subdivision, state, county]
+    census = Census(api_key=api_key, geography_units=geography_units, year=year, dataset=dataset)
+    result = census.get_data(variables)
+    print(result.dataframe)
