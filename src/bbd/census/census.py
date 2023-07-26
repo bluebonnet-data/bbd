@@ -26,12 +26,12 @@ class Census:
     available_variables: pd.DataFrame = field(default_factory = pd.DataFrame) # dataframe of all available variables
     census_tables: list[CensusTable] = field(default_factory = list) # a list of CensusTable objects
 
-    def _build_url(self, variables: list[str]):
+    def _build_url(self, input_strings: list[str]):
         base_url = "https://api.census.gov/data"
         # Collect all parts
         year = self.year
         dataset = self.dataset.value
-        variables = ",".join(variables)
+        input_strings = ",".join(input_strings)
         key = self.api_key
         geo_url = ""
 
@@ -45,37 +45,18 @@ class Census:
                 geo_url += f"{argument}={label}"
             else:
                 geo_url += f"{argument}={label}:{value}"
-
-
-        full_url = f"{base_url}/{year}/{dataset}?get={variables}{geo_url}&key={key}"
+        full_url = f"{base_url}/{year}/{dataset}?get={input_strings}{geo_url}&key={key}"
         return full_url
 
 
-
-        # for i in range(statement_count):
-        #     if i < statement_count - 1:
-        #         prefix = "for"
-        #         #If the user wants every lower-level item, e.g. county in state,
-        #         # give them results for each individual county
-        #         if geo_statements[i][1] == "*":
-        #             geo_url = geo_url + (f"&{prefix}={geo_statements[i][0].value}")
-        #         # If the user wants no lower-level item, e.g. just net state information,
-        #         #give them only higher level results
-        #         elif geo_statements[i][1] is None:
-        #             geo_url = geo_url + (f"&{prefix}={geo_statements[i][0].value}:*")
-        #         else:
-        #             geo_url = geo_url + (
-        #                 f"&{prefix}={urllib.parse.quote(geo_statements[i][0].value)}:{geo_statements[i][1]}")
-        #     else:
-        #         prefix = "in"
-        #         geo_url = geo_url + (f"&{prefix}={urllib.parse.quote(geo_statements[i][0].value)}:{geo_statements[i][1]}")
-        #
-        # full_url = f"{base_url}/{year}/{dataset}?get={variables}{geo_url}&key={key}"
-        # return full_url
-
-
-    def _make_query(self, variables):
-        url = self._build_url(variables)
+    def _make_query(self, variables: Optional[str] = None, groups: Optional[str] = None):
+        assert variables or groups
+        input_strings = [item for item in variables if variables is not None]
+        if groups is not None:
+            for group in groups:
+                group_string = f"group({group})"
+                input_strings.append(group_string)
+        url = self._build_url(input_strings)
         response = requests.get(url)
         return response
 

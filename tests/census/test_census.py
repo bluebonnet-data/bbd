@@ -33,7 +33,7 @@ def test_make_query_no_nones():
     subdivision = GeographyUnit(argument=Arguments.for_input, label=Geography.COUNTY_SUBDIVISION, value="*")
     geography_units = [subdivision, state, county]
     census = Census(api_key=api_key, geography_units=geography_units, year=year, dataset=dataset)
-    result = census._make_query(variables)
+    result = census._make_query(variables = variables, groups = None)
     print(result.json())
     assert result is not None
 
@@ -48,6 +48,21 @@ def test_make_query_has_nones():
     geography_units = [subdivision, state, county]
     census = Census(api_key=api_key, geography_units=geography_units, year=year, dataset=dataset)
     result = census._make_query(variables)
+    print(result.json())
+    assert result is not None
+
+def test_make_query_has_groups():
+    api_key = API_KEY
+    year = 2019
+    dataset = DataSet.ACS1
+    variables = ["NAME", "B01001_001E"]
+    groups = ["B02015"]
+    state = GeographyUnit(argument=Arguments.in_input, label=Geography.STATE, value="36")
+    county = GeographyUnit(argument=Arguments.in_input, label=Geography.COUNTY, value="*")
+    subdivision = GeographyUnit(argument=Arguments.for_input, label=Geography.COUNTY_SUBDIVISION, value=None)
+    geography_units = [subdivision, state, county]
+    census = Census(api_key=api_key, geography_units=geography_units, year=year, dataset=dataset)
+    result = census._make_query(variables = variables, groups = groups)
     print(result.json())
     assert result is not None
 
