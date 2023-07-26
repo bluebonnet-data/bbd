@@ -66,46 +66,16 @@ def test_make_query_has_groups():
     print(result.json())
     assert result is not None
 
-#Can we get a sensus result with all nested state counties
-def test_get_census_result_all_counties():
-    api_key = API_KEY
-    year = 2019
-    dataset = DataSet.ACS1
-    variables = ["NAME", "B01001_001E"]
-    geography_values = OrderedDict()
-    geography_values[Geography.STATE] = "36"
-    geography_values[Geography.COUNTY] = "*"
-    geography_values[Geography.COUNTY_SUBDIVISION] = "*"
-    census = Census(api_key=api_key, geography_values=geography_values, year=year, dataset=dataset)
-    result = census.get_acs(variables)
-    print(f"result json: {result.data}")
-    assert result.data is not None
-
-#Can we get a sensus result with only One state's results
-def test_get_census_result_no_counties():
-    api_key = API_KEY
-    year = 2019
-    dataset = DataSet.ACS1
-    variables = ["NAME", "B01001_001E"]
-    geography_values = OrderedDict()
-    geography_values[Geography.STATE] = "36"
-    geography_values[Geography.COUNTY] = None
-    geography_values[Geography.COUNTY_SUBDIVISION] = None
-    census = Census(api_key=api_key, geography_values=geography_values, year=year, dataset=dataset)
-    result = census.get_acs(variables)
-    print(f"result json: {result.data}")
-    assert result.data is not None
-
 def test_get_all_vars():
     api_key = API_KEY
     year = 2019
     dataset = DataSet.ACS1
     variables = ["NAME", "B01001_001E"]
-    geography_values = OrderedDict()
-    geography_values[Geography.STATE] = "36"
-    geography_values[Geography.COUNTY] = "*"
-    geography_values[Geography.COUNTY_SUBDIVISION] = "*"
-    census = Census(api_key=api_key, geography_values=geography_values, year=year, dataset=dataset)
+    state = GeographyUnit(argument=Arguments.in_input, label=Geography.STATE, value="36")
+    county = GeographyUnit(argument=Arguments.in_input, label=Geography.COUNTY, value="*")
+    subdivision = GeographyUnit(argument=Arguments.for_input, label=Geography.COUNTY_SUBDIVISION, value=None)
+    geography_units = [subdivision, state, county]
+    census = Census(api_key=api_key, geography_units=geography_units, year=year, dataset=dataset)
     names_to_tables = census._get_all_vars()
     print(names_to_tables)
     assert len(names_to_tables) > 50
@@ -117,11 +87,11 @@ def test_proportion_match():
     year = 2019
     dataset = DataSet.ACS1
     variables = ["NAME", "B01001_001E"]
-    geography_values = OrderedDict()
-    geography_values[Geography.STATE] = "36"
-    geography_values[Geography.COUNTY] = "*"
-    geography_values[Geography.COUNTY_SUBDIVISION] = "*"
-    census = Census(api_key=api_key, geography_values=geography_values, year=year, dataset=dataset)
+    state = GeographyUnit(argument=Arguments.in_input, label=Geography.STATE, value="36")
+    county = GeographyUnit(argument=Arguments.in_input, label=Geography.COUNTY, value="*")
+    subdivision = GeographyUnit(argument=Arguments.for_input, label=Geography.COUNTY_SUBDIVISION, value=None)
+    geography_units = [subdivision, state, county]
+    census = Census(api_key=api_key, geography_units=geography_units, year=year, dataset=dataset)
     match_proportion = census._proportion_match(search_string, comparison_string)
     print(match_proportion)
     assert match_proportion > 0.50
@@ -130,11 +100,11 @@ def test_dataframe_all_variables():
     api_key = API_KEY
     year = 2019
     dataset = DataSet.ACS1
-    geography_values = OrderedDict()
-    geography_values[Geography.STATE] = "36"
-    geography_values[Geography.COUNTY] = "*"
-    geography_values[Geography.COUNTY_SUBDIVISION] = "*"
-    census = Census(api_key=api_key, geography_values=geography_values, year=year, dataset=dataset)
+    state = GeographyUnit(argument=Arguments.in_input, label=Geography.STATE, value="36")
+    county = GeographyUnit(argument=Arguments.in_input, label=Geography.COUNTY, value="*")
+    subdivision = GeographyUnit(argument=Arguments.for_input, label=Geography.COUNTY_SUBDIVISION, value=None)
+    geography_units = [subdivision, state, county]
+    census = Census(api_key=api_key, geography_units=geography_units, year=year, dataset=dataset)
     df = census._datafame_all_variables()
     print(df)
     assert df is not None
@@ -144,10 +114,11 @@ def test_census_search_variables():
     year = 2019
     dataset = DataSet.ACS1
     geography_values = OrderedDict()
-    geography_values[Geography.STATE] = "36"
-    geography_values[Geography.COUNTY] = "*"
-    geography_values[Geography.COUNTY_SUBDIVISION] = "*"
-    census = Census(api_key=api_key, geography_values=geography_values, year=year, dataset=dataset)
+    state = GeographyUnit(argument=Arguments.in_input, label=Geography.STATE, value="36")
+    county = GeographyUnit(argument=Arguments.in_input, label=Geography.COUNTY, value="*")
+    subdivision = GeographyUnit(argument=Arguments.for_input, label=Geography.COUNTY_SUBDIVISION, value=None)
+    geography_units = [subdivision, state, county]
+    census = Census(api_key=api_key, geography_units=geography_units, year=year, dataset=dataset)
     search_string = "county"
     number_of_results = 10
     df = census.search_variables(search_string, number_of_results)
@@ -160,11 +131,11 @@ def test_census_search_variables_no_string():
     api_key = API_KEY
     year = 2019
     dataset = DataSet.ACS1
-    geography_values = OrderedDict()
-    geography_values[Geography.STATE] = "36"
-    geography_values[Geography.COUNTY] = "*"
-    geography_values[Geography.COUNTY_SUBDIVISION] = "*"
-    census = Census(api_key=api_key, geography_values=geography_values, year=year, dataset=dataset)
+    state = GeographyUnit(argument=Arguments.in_input, label=Geography.STATE, value="36")
+    county = GeographyUnit(argument=Arguments.in_input, label=Geography.COUNTY, value="*")
+    subdivision = GeographyUnit(argument=Arguments.for_input, label=Geography.COUNTY_SUBDIVISION, value=None)
+    geography_units = [subdivision, state, county]
+    census = Census(api_key=api_key, geography_units=geography_units, year=year, dataset=dataset)
     df = census.search_variables(search_string = None, number_of_results = 30)
     assert len(df) > 0
     print(df)
@@ -173,11 +144,11 @@ def test_acs_to_df():
     api_key = API_KEY
     year = 2019
     dataset = DataSet.ACS1
-    geography_values = OrderedDict()
-    geography_values[Geography.STATE] = "36"
-    geography_values[Geography.COUNTY] = "*"
-    geography_values[Geography.COUNTY_SUBDIVISION] = "*"
     variables = ["NAME", "B01001_001E"]
-    census = Census(api_key=api_key, geography_values=geography_values, year=year, dataset=dataset)
+    state = GeographyUnit(argument=Arguments.in_input, label=Geography.STATE, value="36")
+    county = GeographyUnit(argument=Arguments.in_input, label=Geography.COUNTY, value="*")
+    subdivision = GeographyUnit(argument=Arguments.for_input, label=Geography.COUNTY_SUBDIVISION, value=None)
+    geography_units = [subdivision, state, county]
+    census = Census(api_key=api_key, geography_units=geography_units, year=year, dataset=dataset)
     result = census.get_acs(variables)
     print(result.data)
