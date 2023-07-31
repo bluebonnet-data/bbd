@@ -1,6 +1,6 @@
 from dataclasses import dataclass
-from bbd.models import geography
-from bbd.census import arguments
+from bbd.models import geography, arguments
+
 
 @dataclass
 class GeographyUnit():
