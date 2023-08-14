@@ -2,7 +2,7 @@ from __future__ import annotations
 import enum
 
 
-class Geography(enum.Enum):
+class GEOGRAPHY(enum.Enum):
     US = "us"
     REGION = "region"
     DIVISION = "division"
@@ -27,3 +27,5 @@ class Geography(enum.Enum):
     PRINCIPAL_CITY = "principal city"
     NECTA_DIVISION = "necta division"
     URBAN_AREA = "urban area"
+    TRACT = "tract"
+    BLOCK_GROUP = "block group"
