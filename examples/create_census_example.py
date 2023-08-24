@@ -23,8 +23,8 @@ with open(api_key_file, "r") as f:
 # use "none_level" for api-pulls which require unorthodox arguments, which we will discuss in a future guide.
 
 # Example: geographic units targeting data for all counties in the state of New York (36 = Census code for New York)
-county = GeographicUnit(analysis_level=AnalysisLevel.for_level, geography=Geography.COUNTY, value="*")
-state = GeographicUnit(analysis_level=AnalysisLevel.in_level, geography=Geography.STATE, value="36")
+county = GeographicUnit(analysis_level=AnalysisLevel.FOR, geography=Geography.COUNTY, value="*")
+state = GeographicUnit(analysis_level=AnalysisLevel.IN, geography=Geography.STATE, value="36")
 geographic_units = [state, county]
 
 ########################

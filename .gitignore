@@ -19,6 +19,8 @@ build
 
 # User files
 user
+/local_files
+/cached_csvs
 
 # Shapefiles
 *.dbf

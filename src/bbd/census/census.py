@@ -1,15 +1,13 @@
 from __future__ import annotations
 import pandas as pd
 from dataclasses import dataclass, field
-from typing import Optional, OrderedDict
+from typing import Optional
 from bbd.census.census_table import CensusTable
-from bbd.models import geography
 import urllib.parse
 import requests
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from bbd.census.census_result import CensusResult
-from bbd.census import geography_unit
 
 # Make pandas display properly; consider removing later
 pd.set_option('display.max_columns', None)
@@ -19,33 +17,33 @@ pd.set_option('display.max_columns', None)
 @dataclass
 class Census:
     api_key: str
-    geography_units: list[geography_unit.GeographyUnit]
+    geographic_units: list[geography_unit.GeographicUnit]
     year: str | int
     dataset: dataset.Dataset
-    results: list[str] = field(default_factory = list) # list of CensusResult objects
+    results: list[str] = field(default_factory = list)     # list of CensusResult objects
     available_variables: pd.DataFrame = field(default_factory = pd.DataFrame) # dataframe of all available variables
     census_tables: list[CensusTable] = field(default_factory = list) # a list of CensusTable objects
 
-    def _build_url(self, input_strings: list[str]):
+    def _build_url(self, variables_groups: list[str]):
         base_url = "https://api.census.gov/data"
         # Collect all parts
         year = self.year
         dataset = self.dataset.value
-        input_strings = ",".join(input_strings)
+        variables_groups = ",".join(variables_groups)
         key = self.api_key
         geo_url = ""
 
         # parse geography
-        geographies = self.geography_units
+        geographies = self.geographic_units
         for unit in geographies:
-            argument = unit.argument.value
-            label = urllib.parse.quote(unit.label.value, safe = "()/")
+            argument = unit.analysis_level.value
+            label = urllib.parse.quote(unit.geography.value, safe ="()/")
             value = unit.value
             if value is None:
                 geo_url += f"{argument}{label}"
             else:
                 geo_url += f"{argument}{label}:{value}"
-        full_url = f"{base_url}/{year}/{dataset}?get={input_strings}{geo_url}&key={key}"
+        full_url = f"{base_url}/{year}/{dataset}?get={variables_groups}{geo_url}&key={key}"
         return full_url
 
 
@@ -60,9 +58,9 @@ class Census:
         response = requests.get(url)
         return response
 
-    def get_data(self, variables) -> CensusResult:
-        '''Query the database '''
-        response = self._make_query(variables)
+    def get_data(self, variables:Optional[list[str]] = None, groups:Optional[list[str]] = None) -> CensusResult:
+        assert variables or groups
+        response = self._make_query(variables = variables, groups = groups)
         result = CensusResult(response=response, variables=variables)
         self.results.append(result)
         return result

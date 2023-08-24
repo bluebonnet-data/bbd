@@ -40,7 +40,7 @@ We can simply downloaded the census data like so:
 ```python
 >> > from bbd import census
 >> > data = census.get_acs(
-            >> > geography = census.Geography.CD,
+            >> > geography = census.GEOGRAPHY.CD,
 >> > variables = "group(DP03),NAME",
 >> > year = 2018,
 >> > state = "co",
@@ -86,12 +86,12 @@ When you request it from the API with `get_acs`, it is automatically converted t
 Luckily, the census provides shapefiles for pretty much every `GEO_ID` you can find in the census API. You can automatically download them like this:
 
 ```python
->>> shapefile_path = census.get_shapefile(
->>>     geography=census.Geography.CD,
->>>     state="co",
->>>     year=2018,
->>>     cache=True,
->>> )
+>> > shapefile_path = census.get_shapefile(
+                      >> > geography = census.GEOGRAPHY.CD,
+>> > state = "co",
+>> > year = 2018,
+>> > cache = True,
+>> > )
 ```
 
 To get these files manually, just head to [this website](https://www.census.gov/cgi-bin/geo/shapefiles/index.php) and select the relevent geography/location.

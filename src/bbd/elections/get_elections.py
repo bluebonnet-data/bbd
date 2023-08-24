@@ -1,11 +1,11 @@
 import pandas as pd
-from ..models import Geography, Election
+from ..models import GEOGRAPHY, Election
 from typing import Optional, Iterable
 
 def get_elections(election_office: Optional[Election] = None,
-                  aggregate_into: Optional[Geography] = None,
+                  aggregate_into: Optional[GEOGRAPHY] = None,
                   years: Iterable[int] = (),
-                  districts: Iterable[Geography] = ()):
+                  districts: Iterable[GEOGRAPHY] = ()):
     """
     Returns the election results for a specific election office and election year and returns the Democratic & Republican vote share
 
@@ -22,7 +22,7 @@ def get_elections(election_office: Optional[Election] = None,
             "TX": {
                 "years": [],
                 "election_office": [Election.SL, Election.SU, Election.PRES],
-                "geo_levels": [Geography.PRECINCT, Geography.SL, Geography.UL, Geography.COUNTY, Geography.STATE],
+                "geo_levels": [GEOGRAPHY.PRECINCT, GEOGRAPHY.SL, GEOGRAPHY.UL, GEOGRAPHY.COUNTY, GEOGRAPHY.STATE],
                 # state, all 33 state districts, all 150 house districts
             }
         }

@@ -9,8 +9,8 @@ api_key_file = Path(__file__).parent.absolute() / "census_api_key.txt"
 with open(api_key_file, "r") as f:
     API_KEY = f.readlines()[0]
 
-county = GeographicUnit(analysis_level=AnalysisLevel.for_level, geography=Geography.COUNTY, value="*")
-state = GeographicUnit(analysis_level=AnalysisLevel.in_level, geography=Geography.STATE, value="36")
+county = GeographicUnit(analysis_level=AnalysisLevel.FOR, geography=Geography.COUNTY, value="*")
+state = GeographicUnit(analysis_level=AnalysisLevel.IN, geography=Geography.STATE, value="36")
 geographic_units = [state, county]
 year = 2019
 dataset = DataSet.ACS1

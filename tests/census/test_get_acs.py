@@ -5,7 +5,7 @@ def _construct_call(variables):
     census.api_key.key = "MyApiKey"
 
     return census.construct_api_call(
-        geography=models.Geography.STATE,
+        geography=models.GEOGRAPHY.STATE,
         variables=variables,
         year=2018,
         dataset=census.DataSet.ACS5,

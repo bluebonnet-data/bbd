@@ -5,7 +5,7 @@ import requests
 
 from ..working_directory import working_directory
 
-from ..models import Geography
+from ..models import GEOGRAPHY
 from .dataset import DataSet
 from .api_key import api_key
 from .load import load_json_str, load_json_file
@@ -13,7 +13,7 @@ from .us import state_to_fips
 
 
 def get_acs(
-    geography: Geography,
+    geography: GEOGRAPHY,
     variables: Union[str, List[str]],
     year: Union[str, int] = 2018,
     dataset: DataSet = DataSet.ACS5,
@@ -73,7 +73,7 @@ def url_to_filename(url: str) -> str:
 
 
 def construct_api_call(
-    geography: Geography,
+    geography: GEOGRAPHY,
     variables: str | list[str],
     year:  str | int = 2018,
     dataset: DataSet = DataSet.ACS5,

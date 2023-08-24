@@ -2,7 +2,6 @@ from __future__ import annotations
 import requests
 import pandas as pd
 
-@dataclass
 class ElectionsResult():
     def __init__(self, response: requests.Reponse, variables: list[str]):
         self.response = response

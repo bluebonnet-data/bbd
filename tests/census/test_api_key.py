@@ -8,7 +8,7 @@ from bbd import census, models
 def test_api_key_required():
     with pytest.raises(ValueError):
         census.construct_api_call(
-            geography=models.Geography.STATE,
+            geography=models.GEOGRAPHY.STATE,
             variables="B03003_001E",
             year=2018,
             dataset=census.DataSet.ACS5,
@@ -28,7 +28,7 @@ def test_can_call_census_api():
     SAMPLE_API_KEY = "abc123"
     census.api_key.key = SAMPLE_API_KEY
     url = census.construct_api_call(
-        geography=models.Geography.STATE,
+        geography=models.GEOGRAPHY.STATE,
         variables="B03003_001E",
         year=2018,
         dataset=census.DataSet.ACS5,
