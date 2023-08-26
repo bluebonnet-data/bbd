@@ -10,7 +10,7 @@ import ssl
 from bbd.github_data_extractor.threadpool import ThreadPool
 from bbd.github_data_extractor.utils.link_node import LinkNode
 from bbd.github_data_extractor.utils.link_type import LinkType
-from bbd.github_data_extractor.utils.helper import leaf_to_local_csv
+from bbd.github_data_extractor.utils.helper import leaf_to_local_csv, cache_url_from_leaf
 
 # Allow for extraction of csvs later even if certificate verification fails
 ssl._create_default_https_context = ssl._create_unverified_context
@@ -127,7 +127,9 @@ def main():
     leaves = extractor.get_files_by_extension(link_node_list=extractor.repos, extension=".csv", thread_count=1)
 
     for leaf in leaves:
-        leaf_to_local_csv(leaf, directory_name="cached_csvs")
+        # leaf_to_local_csv(leaf, directory_name="cached_csvs")
+        print(f"saving url: {leaf.url}")
+        cache_url_from_leaf(leaf, file_name="cached_urls.txt")
 
 
 

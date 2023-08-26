@@ -15,3 +15,11 @@ def leaf_to_local_csv(leaf: LinkNode, directory_name: Optional[str] = "cached_cs
             f.write(result.content)
     else:
         print(f"File already exists, skipping: {leaf.name}")
+
+
+def cache_url_from_leaf(leaf: LinkNode, file_name: str):
+    with open(f"{file_name}", 'a+') as f:
+        if file_name not in f:
+            f.write(f"{leaf.url}\n")
+        else:
+            print(f"Skipping duplicate record: {leaf.url}")
