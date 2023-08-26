@@ -1,24 +1,24 @@
 from __future__ import annotations
-
-from typing import Optional
 from collections.abc import Iterable
 from datetime import timedelta, datetime
 from time import sleep
+from typing import Optional
 import requests
-import pandas as pd
-import os
-import ssl
 import threading
+import tests.github_data_extractor.config
+import ssl
 from bbd.github_data_extractor.threadpool import ThreadPool
 from bbd.github_data_extractor.utils.link_node import LinkNode
 from bbd.github_data_extractor.utils.link_type import LinkType
+from bbd.github_data_extractor.utils.helper import leaf_to_local_csv
 
-# Allow for extraction of csvs even if certificate verification fails
+# Allow for extraction of csvs later even if certificate verification fails
 ssl._create_default_https_context = ssl._create_unverified_context
 
+
 class Extractor:
-    def __init__(self, org: str, rate_limit: timedelta, username_token: tuple(str, str)):
-        # github authentication variables
+    def __init__(self, org: str, rate_limit: timedelta, username_token: tuple[str, str]):
+        # GitHub's authentication variables
         self.username_token = username_token
         # Get a list of all repos for org
         page = 1
@@ -36,12 +36,12 @@ class Extractor:
                 more_pages = False
         self.repos = repos
 
-        # Rate Limit Varaibles
+        # Rate Limit Variables
         self.last_request = datetime.now()
         self.rate_limit = rate_limit
         self.rate_limit_lock = threading.Lock()
 
-    def rate_limited_request(self, *args, **kwags):
+    def rate_limited_request(self, *args, **kwargs):
         self.rate_limit_lock.acquire()
         next_request = self.last_request + self.rate_limit
         wait_seconds = (next_request - datetime.now()).total_seconds()
@@ -53,43 +53,56 @@ class Extractor:
             wait_seconds = (next_request - datetime.now()).total_seconds()
         self.last_request = datetime.now()
         self.rate_limit_lock.release()
-        return requests.get(*args, **kwags)
+        return requests.get(*args, **kwargs)
 
     def get_children(self, link_node: LinkNode) -> list[LinkNode]:
-        print(f'{link_node!r}')
+        print(f'getting children for node: {link_node!r}')
         children = []
         try:
             top_url = link_node.url
             result = self.rate_limited_request(top_url, auth=self.username_token).json()
             for item in result:
-                name = item["name"]
-                type_ = LinkType(item["type"])
-                if type_ == LinkType.FILE:
-                    url = item["download_url"]
-                elif type_ == LinkType.DIRECTORY:
-                    url = item["url"]
-                children.append(LinkNode(name=name,
-                                     url=url,
-                                     type_=type_,
-                                     depth=link_node.depth + 1,
-                                     parent=link_node))
+                try:
+                    name = item["name"]
+                    type_ = LinkType(item["type"])
+                    if type_ == LinkType.FILE:
+                        url = item["download_url"]
+
+                    else:
+                        url = item["url"]
+                    children.append(LinkNode(name=name,
+                                         url=url,
+                                         type_=type_,
+                                         depth=link_node.depth + 1,
+                                         parent=link_node))
+
+                # If the repository is empty, don't return any children, but modify the repo LinkNode in place
+                except TypeError as e:
+                    if result["message"] == 'This repository is empty.':
+                        link_node.type_ = LinkType.ERROR
+                    link_node.error = e
+                    continue
 
             return children
 
         except requests.ConnectionError as e:
-            return [LinkNode(url=link_node.url, depth=link_node.depth, parent=link_node.parent, error=e)]
+            return [LinkNode(name=link_node.name,
+                             type_=link_node.type_,
+                             url=link_node.url,
+                             depth=link_node.depth,
+                             parent=link_node.parent,
+                             error=e)]
 
-    def get_files(self, link_node_list: list[LinkNode]) -> Iterable[LinkNode]:
-        with ThreadPool(10) as queue:
+    def get_files_by_extension(self, link_node_list: Iterable[LinkNode], extension: str, thread_count: int) -> Iterable[LinkNode]:
+        with ThreadPool(thread_count) as queue:
             for node in link_node_list:
                 queue.add_item(self.get_children, node)
-            #all_leaves = []
-
             for children in queue:
                 for child in children:
                     if child.type_ == LinkType.DIRECTORY:
                         queue.add_item(self.get_children, child)
-                    elif child.type_ == LinkType.FILE:
+                    elif child.type_ == LinkType.FILE and child.name[-4:] == extension:
+                        print(child.url)
                         yield child
                     elif child.type_ == LinkType.ERROR:
                         print(f" \n \n {child.error} \n")
@@ -98,27 +111,24 @@ class Extractor:
                         continue
         print(f'{queue=}')
         assert queue.input_count == 0
-        assert queue.processing_count_count == 0
+        assert queue.processing_count == 0
         assert queue.output_count == 0
 
+# creates a new folder in current working directory and deposits csvs
 
-# creates a new folder in current working directory
-#     def leaf_to_local_csv(self, leaf, directory_name ="cached_csvs"):
-#         base = "https://raw.githubusercontent.com"
-#         extension = leaf.url.replace("/blob", "")
-#         full_url = base + extension
-#         df = pd.read_csv(full_url)
-#         if not os.path.exists(directory_name):
-#             os.makedirs(directory_name)
-#         df.to_csv(f"{directory_name}/{leaf.url_id}")
-#
 
 def main():
-    testObject = Extractor(org="openelections", rate_limit=timedelta(milliseconds=200))
-    leaves = testObject.get_files(link_node_list=testObject.repos)
+    GITHUB_KEY = tests.github_data_extractor.config.GITHUB_KEY
+    GITHUB_USERNAME = tests.github_data_extractor.config.GITHUB_KEY
+    org = "openelections"
+    rate_limit = timedelta(milliseconds=200)
+    username_token = (GITHUB_USERNAME, GITHUB_KEY)
+    extractor = Extractor(org=org, rate_limit=rate_limit, username_token=username_token)
+    leaves = extractor.get_files_by_extension(link_node_list=extractor.repos, extension=".csv", thread_count=1)
 
     for leaf in leaves:
-        print(leaf.url)
+        leaf_to_local_csv(leaf, directory_name="cached_csvs")
+
 
 
 

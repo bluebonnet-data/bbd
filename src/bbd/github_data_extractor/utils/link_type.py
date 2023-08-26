@@ -5,9 +5,11 @@ class LinkType(enum.Enum):
     REPO = "repo"
     DIRECTORY = "dir"
     FILE = "file"
+    # EMPTY = "empty"
     # CSV = enum.auto()
-    # ERROR = enum.auto()
+    ERROR = "error"
     OTHER = "other"
+    SYMBOLIC_LINK = "symlink"
 
 
 
