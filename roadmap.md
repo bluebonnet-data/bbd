@@ -1,3 +1,5 @@
+## NOTE: OUTDATED AS OF 2023 -- SEE NOTION
+
 # Objective
 The first objective of this library is to make getting and visualizing census (and ACS) data an easy process for the user. If the user wants something more advanced, they will probably need to write some of their own mapping / coloring methods.
 
