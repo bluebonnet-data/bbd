@@ -12,7 +12,7 @@ pd.set_option('display.max_columns', None)
 
 @dataclass
 class Census:
-    api_key: str
+    api_key: _ApiKey
     geography_values: OrderedDict[geography.Geography, str]
     year: str | int
     dataset: dataset.Dataset

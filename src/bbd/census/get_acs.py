@@ -74,8 +74,8 @@ def url_to_filename(url: str) -> str:
 
 def construct_api_call(
     geography: Geography,
-    variables: str | list[str],
-    year:  str | int = 2018,
+    variables: Union[str, List[str]],
+    year: Union[str, int] = 2018,
     dataset: DataSet = DataSet.ACS5,
     state: Optional[str] = None,
     county: Optional[str] = None,
