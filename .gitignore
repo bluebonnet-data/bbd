@@ -6,6 +6,7 @@ __pycache__
 .vscode
 .tox
 .python-version
+.DS_Store
 
 # Sublime environment
 *.sublime-project
@@ -34,3 +35,6 @@ user
 
 # Shh, secrets
 census_api_key.txt
+
+#api key
+config.py

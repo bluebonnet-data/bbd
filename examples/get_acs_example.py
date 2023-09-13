@@ -14,7 +14,7 @@ data = census.get_acs(
     geography=census.Geography.STATE,
     variables="NAME,B03003_001E",
     year=2018,
-    dataset=census.DataSets.ACS5_DETAIL,
+    dataset=census.DataSet.ACS5,
 )
 
 pprint(data)

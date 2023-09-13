@@ -1,14 +1,14 @@
-from bbd import census
+from bbd import census, models
 
 
 def _construct_call(variables):
     census.api_key.key = "MyApiKey"
 
     return census.construct_api_call(
-        geography=census.Geography.STATE,
+        geography=models.Geography.STATE,
         variables=variables,
         year=2018,
-        dataset=census.DataSets.ACS5_DETAIL,
+        dataset=census.DataSet.ACS5,
     )
 
 
