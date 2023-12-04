@@ -9,4 +9,11 @@
     <orderEntry type="jdk" jdkName="Python 3.11 (censusExplorer)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
+  <component name="PyNamespacePackagesService">
+    <option name="namespacePackageFolders">
+      <list>
+        <option value="$MODULE_DIR$/src/bbd/cloud_storage" />
+      </list>
+    </option>
+  </component>
 </module>

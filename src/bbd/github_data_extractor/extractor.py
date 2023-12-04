@@ -10,8 +10,8 @@ import ssl
 from bbd.github_data_extractor.threadpool import ThreadPool
 from bbd.github_data_extractor.utils.link_node import LinkNode
 from bbd.github_data_extractor.utils.link_type import LinkType
-from bbd.github_data_extractor.utils.helper import leaf_to_local_csv, cache_url_from_leaf
-
+from bbd.github_data_extractor.utils.helper import leaf_to_local_csv, cache_url_from_leaf, leaf_to_uploaded_csv
+from google.cloud import storage
 # Allow for extraction of csvs later even if certificate verification fails
 ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -117,6 +117,7 @@ class Extractor:
 # creates a new folder in current working directory and deposits csvs
 
 
+
 def main():
     GITHUB_KEY = tests.github_data_extractor.config.GITHUB_KEY
     GITHUB_USERNAME = tests.github_data_extractor.config.GITHUB_KEY
@@ -125,11 +126,19 @@ def main():
     username_token = (GITHUB_USERNAME, GITHUB_KEY)
     extractor = Extractor(org=org, rate_limit=rate_limit, username_token=username_token)
     leaves = extractor.get_files_by_extension(link_node_list=extractor.repos, extension=".csv", thread_count=1)
+    client = storage.Client("bluebonnet-data-public")
+    export_bucket = client.get_bucket("bluebonnet-data-public")
 
     for leaf in leaves:
-        # leaf_to_local_csv(leaf, directory_name="cached_csvs")
-        print(f"saving url: {leaf.url}")
-        cache_url_from_leaf(leaf, file_name="cached_urls.txt")
+        leaf_to_local_csv(leaf, directory_name="cached_csvs")
+        print(f"saving leaf from: {leaf.url}")
+        #cache_url_from_leaf(leaf, file_name="cached_urls.txt")
+
+    # with open("cached_urls.txt", "r") as read_file:
+    #     with open ("../cloud_storage/data_urls.txt", "a") as write_file:
+    #         for line in read_file:
+    #             if "-data" in line:
+    #                 write_file.write(line)
 
 
 

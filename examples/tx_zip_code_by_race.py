@@ -2,7 +2,7 @@
 
 1) Make sure python is installed
 
-2) Install the bluebonnet data package by running this command in your terminal:
+2) Install the cloud_storage data package by running this command in your terminal:
     pip install bbd
 
 3) Run this python file with the following command:
