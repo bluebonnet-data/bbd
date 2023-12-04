@@ -2,7 +2,7 @@
 
 1) Make sure python is installed
 
-2) Install the bluebonnet data package by running this command in your terminal:
+2) Install the cloud_storage data package by running this command in your terminal:
     pip install bbd
 
 3) Run this python file with the following command:
@@ -56,7 +56,7 @@ data = census.get_acs(
     geography=census.Geography.ZCTA,
     variables=list(variables.keys()),
     year=2018,
-    dataset=census.DataSets.ACS5_DETAIL,
+    dataset=census.DataSet.ACS5,
     # state="tx",
     # county="201": "Harris County
     cache=True,

@@ -1,22 +1,22 @@
 import re
-from typing import Union, List
+from typing import Union, List, Optional
 
 import requests
 
 from ..working_directory import working_directory
 
-from .geography import Geography
-from .datasets import DataSets
+from ..models import GEOGRAPHY
+from .dataset import DataSet
 from .api_key import api_key
 from .load import load_json_str, load_json_file
 from .us import state_to_fips
 
 
 def get_acs(
-    geography: Geography,
+    geography: GEOGRAPHY,
     variables: Union[str, List[str]],
     year: Union[str, int] = 2018,
-    dataset: DataSets = DataSets.ACS5_DETAIL,
+    dataset: DataSet = DataSet.ACS5,
     state: Union[str, None] = None,
     county: Union[str, None] = None,
     cache: bool = False,
@@ -73,12 +73,12 @@ def url_to_filename(url: str) -> str:
 
 
 def construct_api_call(
-    geography: Geography,
-    variables: Union[str, List[str]],
-    year: Union[str, int] = 2018,
-    dataset: DataSets = DataSets.ACS5_DETAIL,
-    state: Union[str, None] = None,
-    county: Union[str, None] = None,
+    geography: GEOGRAPHY,
+    variables: str | list[str],
+    year:  str | int = 2018,
+    dataset: DataSet = DataSet.ACS5,
+    state: Optional[str] = None,
+    county: Optional[str] = None,
 ):
     """Construct a url call to the census api"""
 
@@ -90,16 +90,10 @@ def construct_api_call(
     for_geography = f"&for={geography}:*"
 
     # If a state is provided, request the data returned be within it
-    if state is not None:
-        in_state = f"&in=state:{state_to_fips(state)}"
-    else:
-        in_state = ""
+    in_state = "" if state is None else f"&in=state:{state_to_fips(state)}"
 
     # If a county is provided, request the data returned be within it
-    if county is not None:
-        in_county = f"&in=county:{county}"
-    else:
-        in_county = ""
+    in_county = "" if county is None else f"&in=county:{county}"
 
     # Census api call
     return (

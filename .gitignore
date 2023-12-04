@@ -6,6 +6,7 @@ __pycache__
 .vscode
 .tox
 .python-version
+.DS_Store
 
 # Sublime environment
 *.sublime-project
@@ -18,6 +19,8 @@ build
 
 # User files
 user
+/local_files
+/cached_csvs
 
 # Shapefiles
 *.dbf
@@ -31,6 +34,11 @@ user
 *.json
 *.html
 *.csv
+*.txt
 
 # Shh, secrets
 census_api_key.txt
+
+#api key
+config.py
+*config.py

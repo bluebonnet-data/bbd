@@ -9,7 +9,7 @@ import requests
 
 from ..working_directory import working_directory
 
-from .geography import Geography
+from ..models import GEOGRAPHY
 from .us import state_to_fips
 
 """Maps year to congressional district number"""
@@ -54,7 +54,7 @@ def shapefile_urls(fips: str, year=2019) -> Dict[str, str]:
 
 
 def get_shapefile(
-    geography: Geography,
+    geography: GEOGRAPHY,
     state: Union[int, str],
     year: int,
     cache: bool = False,
@@ -102,4 +102,4 @@ def get_shapefile(
 if __name__ == "__main__":
     state = "CO"
     year = 2019
-    name = get_shapefile(Geography.COUNTY, state, year)
+    name = get_shapefile(GEOGRAPHY.COUNTY, state, year)
