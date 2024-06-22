@@ -42,7 +42,7 @@ class TestGet_geocoder:
         email = valid_email
         geocoder = gc.get_geocoder(email)
 
-        address = "Evans Hall, Berkeley, CA"
+        address = "1600 Pennsylvania Avenue NW, Washington, DC 20500" # The White House
         location = geocoder(address)
 
         error1 = ("Geocoder returned None. Either email not accepted "
@@ -51,9 +51,9 @@ class TestGet_geocoder:
         error3 = "Geocder matched with wrong address."
         assert location is not None, error1
         assert isinstance(location, geopy.location.Location), error2
-        assert (("Evans Hall".lower() in location.address.lower())
-                & isclose(location.latitude, 37.873621099999994) 
-                & isclose(location.longitude, -122.25768131042068)), error3
+        assert (("Pennsylvania Avenue".lower() in location.address.lower())
+                & isclose(location.latitude, 38.897699700000004, rel_tol=1e-5) 
+                & isclose(location.longitude, -77.03655315, rel_tol=1e-5)), error3
 
 
     def test_miniumum_runtime(self):
@@ -91,25 +91,30 @@ class TestGet_reverse_geocoder:
 
     def test_reverse_geocoder(self):
         """Test that the reverse geocoder returned by get_reverse_geocoder
-        accurately reverse geocodes an address.
+        accurately reverse geocodes an address. Note to maintainers and future
+        contributers, the reverse geocoder is not very precise and this test 
+        might break and need a different test location.
         """
         email = valid_email
         reverse_geocoder = gc.get_reverse_geocoder(email)
         
-        point = (37.873621099999994, -122.25768131042068) #Evans Hall, Berkeley Ca
+        point = (38.8976997, -77.03655315) # The White House
         location = reverse_geocoder(point)
+        address = location.address.replace("," ,"").lower()
 
         error1 = ("Geocoder returned None. Either email not accepted "
                   "or address not found by OpenStreetMap")
         error2 = "Geocoder did not return geopy.location.Location"
         error3 = "Geocder matched with wrong address."
 
+        print(location)
+
         assert location is not None, error1
         assert isinstance(location, geopy.location.Location), error2
-        assert (("Evans Hall".lower() in location.address.lower())
-                & ("Berkeley".lower() in location.address.lower())
-                & isclose(location.latitude, 37.873621099999994) 
-                & isclose(location.longitude, -122.25768131042068)), error3
+        assert (("Pennsylvania Avenue".lower() in address)
+                & ("District of Columbia".lower() in address)
+                & isclose(location.latitude, 38.8976997, rel_tol=1e-5) 
+                & isclose(location.longitude,  -77.03655315, rel_tol=1e-5)), error3
 
 
     def test_miniumum_runtime(self):

@@ -1,5 +1,6 @@
 # Python environment
 venv
+bdd-env
 __pycache__
 
 # Dev environment
